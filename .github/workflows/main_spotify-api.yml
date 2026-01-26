@@ -179,7 +179,7 @@ jobs:
             --location westus2 \
             --dns-name-label spotify-keycloak-${{ secrets.AZURE_DNS_SUFFIX }} \
             --os-type Linux \
-            --ports 80 \
+            --ports 8080 \
             --cpu 1 \
             --memory 2 \
             --environment-variables \
@@ -190,7 +190,6 @@ jobs:
               "KC_HOSTNAME=auth.tomaszeuski.com" \
               "KC_HOSTNAME_STRICT=false" \
               "KC_HOSTNAME_STRICT_BACKCHANNEL=false" \
-              "KC_HTTP_PORT=80" \
               "KC_PROXY=edge" \
               "KC_HTTP_ENABLED=true" \
               "KC_HEALTH_ENABLED=true" \
@@ -200,7 +199,7 @@ jobs:
             --secure-environment-variables \
               "KEYCLOAK_ADMIN_PASSWORD=${{ secrets.KEYCLOAK_ADMIN_PASSWORD }}" \
               "KC_DB_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" \
-            --command-line "/opt/keycloak/bin/kc.sh start-dev" \
+            --command-line "/opt/keycloak/bin/kc.sh start" \
             --restart-policy Always \
             --debug
           
