@@ -183,13 +183,36 @@ jobs:
 
       - name: Get Container IP and Update Database Firewall
         run: |
+          echo "Getting container details..."
+          az container show \
+            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+            --name spotify-keycloak \
+            --query "{ip:ipAddress.ip,fqdn:ipAddress.fqdn,state:instanceView.state}" \
+            --output json
+          
           CONTAINER_IP=$(az container show \
             --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
             --name spotify-keycloak \
             --query ipAddress.ip \
             --output tsv)
           
+          if [ -z "$CONTAINER_IP" ]; then
+            echo "ERROR: Container IP is empty. Container may have failed to start."
+            echo "Checking container logs..."
+            az container logs \
+              --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+              --name spotify-keycloak
+            exit 1
+          fi
+          
           echo "Keycloak container IP: $CONTAINER_IP"
+          
+          az postgres flexible-server firewall-rule delete \
+            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+            --name ${{ secrets.POSTGRES_SERVER_NAME }} \
+            --rule-name AllowKeycloak \
+            --yes \
+            || echo "No existing firewall rule to delete"
           
           az postgres flexible-server firewall-rule create \
             --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
