@@ -221,6 +221,7 @@ jobs:
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_3878F5AFEC344BC2B2E01C27B890EE86 }}
 
       - name: Configure App Settings
+        shell: bash
         run: |
           az webapp config appsettings set \
             --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
