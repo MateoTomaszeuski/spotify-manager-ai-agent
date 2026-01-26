@@ -156,7 +156,6 @@ jobs:
             --ports 8080 \
             --cpu 1 \
             --memory 2 \
-            --no-wait \
             --environment-variables \
               KEYCLOAK_ADMIN=admin \
               KC_DB=postgres \
@@ -173,13 +172,6 @@ jobs:
               KC_DB_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} \
             --command-line "start" \
             --restart-policy Always
-          
-          echo "Waiting for container to be created..."
-          az container wait \
-            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
-            --name spotify-keycloak \
-            --created \
-            --timeout 300
 
       - name: Get Container IP and Update Database Firewall
         run: |
