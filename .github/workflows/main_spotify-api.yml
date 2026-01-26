@@ -128,9 +128,69 @@ jobs:
           docker compose -f docker-compose/docker-compose.integration-tests.yml down -v || true
           docker rmi client_test_container || true
 
+  deploy-keycloak:
+    runs-on: ubuntu-latest
+    needs: [backend-integration-tests, frontend-tests]
+    if: github.event_name != 'pull_request'
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_E11D8A264184433CBE19677919D58C91 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_F4ED1DD91E7E431585E099E24C964737 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_3878F5AFEC344BC2B2E01C27B890EE86 }}
+
+      - name: Deploy Keycloak to Azure Container Instances
+        run: |
+          az container create \
+            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+            --name spotify-keycloak \
+            --image quay.io/keycloak/keycloak:26.0 \
+            --dns-name-label spotify-keycloak-${{ secrets.AZURE_DNS_SUFFIX }} \
+            --ports 8080 \
+            --cpu 1 \
+            --memory 2 \
+            --environment-variables \
+              KEYCLOAK_ADMIN=admin \
+              KC_DB=postgres \
+              KC_DB_URL=jdbc:postgresql://${{ secrets.POSTGRES_HOST }}/keycloakdb \
+              KC_DB_USERNAME=${{ secrets.POSTGRES_USER }} \
+              KC_HOSTNAME=${{ secrets.KEYCLOAK_HOSTNAME }} \
+              KC_HOSTNAME_STRICT=false \
+              KC_HOSTNAME_STRICT_BACKCHANNEL=false \
+              KC_HTTP_ENABLED=true \
+              KC_HEALTH_ENABLED=true \
+              KC_PROXY=edge \
+            --secure-environment-variables \
+              KEYCLOAK_ADMIN_PASSWORD=${{ secrets.KEYCLOAK_ADMIN_PASSWORD }} \
+              KC_DB_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} \
+            --command-line "start" \
+            --restart-policy Always
+
+      - name: Get Container IP and Update Database Firewall
+        run: |
+          CONTAINER_IP=$(az container show \
+            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+            --name spotify-keycloak \
+            --query ipAddress.ip \
+            --output tsv)
+          
+          echo "Keycloak container IP: $CONTAINER_IP"
+          
+          az postgres flexible-server firewall-rule create \
+            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+            --name ${{ secrets.POSTGRES_SERVER_NAME }} \
+            --rule-name AllowKeycloak \
+            --start-ip-address $CONTAINER_IP \
+            --end-ip-address $CONTAINER_IP
+
   build-and-deploy:
     runs-on: windows-latest
-    needs: [backend-integration-tests, frontend-tests]
+    needs: [backend-integration-tests, frontend-tests, deploy-keycloak]
     if: github.event_name != 'pull_request'
     permissions:
       id-token: write
