@@ -15,20 +15,17 @@ namespace API.UnitTests.Services;
 public class AIServiceTests {
     private readonly Mock<ILogger<AIService>> _mockLogger;
     private readonly Mock<IConfiguration> _mockConfiguration;
-    private readonly Mock<HttpMessageHandler> _mockHttpMessageHandler;
     private readonly AIService _aiService;
 
     public AIServiceTests() {
         _mockLogger = new Mock<ILogger<AIService>>();
         _mockConfiguration = new Mock<IConfiguration>();
-        _mockHttpMessageHandler = new Mock<HttpMessageHandler>();
-        var httpClient = new HttpClient(_mockHttpMessageHandler.Object);
 
-        _mockConfiguration.Setup(c => c["AI:ApiBaseUrl"]).Returns("https://test.api/chat/completions");
-        _mockConfiguration.Setup(c => c["AI:Model"]).Returns("test-model");
-        _mockConfiguration.Setup(c => c["AI:ApiKey"]).Returns("test-api-key");
+        _mockConfiguration.Setup(c => c["AzureAI:Endpoint"]).Returns("https://test.openai.azure.com");
+        _mockConfiguration.Setup(c => c["AzureAI:ApiKey"]).Returns("test-api-key");
+        _mockConfiguration.Setup(c => c["AzureAI:Model"]).Returns("gpt-4o");
 
-        _aiService = new AIService(httpClient, _mockConfiguration.Object, _mockLogger.Object);
+        _aiService = new AIService(_mockConfiguration.Object, _mockLogger.Object);
     }
 
     [Test]
