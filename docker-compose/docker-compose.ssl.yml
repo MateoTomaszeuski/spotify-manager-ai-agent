@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  nginx-ssl:
+    image: nginx:alpine
+    container_name: spotify-nginx-ssl
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx-ssl.conf:/etc/nginx/conf.d/default.conf
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    depends_on:
+      - keycloak
+    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+
+  certbot:
+    image: certbot/certbot
+    container_name: spotify-certbot
+    restart: unless-stopped
+    volumes:
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.0
+    container_name: spotify-keycloak
+    restart: unless-stopped
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD:-admin}
+      - KC_DB=postgres
+      - KC_DB_URL=jdbc:postgresql://postgres:5432/keycloakdb
+      - KC_DB_USERNAME=${POSTGRES_USER:-spotifyuser}
+      - KC_DB_PASSWORD=${POSTGRES_PASSWORD:-spotifypass}
+      - KC_HOSTNAME=auth.tomaszeuski.com
+      - KC_HOSTNAME_STRICT=true
+      - KC_PROXY=edge
+      - KC_HTTP_ENABLED=true
+      - KC_HEALTH_ENABLED=true
+    # Don't expose 8080 externally - nginx will handle it
+    expose:
+      - "8080"
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:15
+    container_name: spotify-postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER:-spotifyuser}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-spotifypass}
+      - POSTGRES_DB=spotifydb
+      - POSTGRES_MULTIPLE_DATABASES=spotifydb,keycloakdb
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ../db/00-create-databases.sh:/docker-entrypoint-initdb.d/00-create-databases.sh
+
+volumes:
+  postgres_data:
