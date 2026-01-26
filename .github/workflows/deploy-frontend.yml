@@ -40,10 +40,3 @@ jobs:
           output_location: "dist" # Built app content directory - optional
           github_id_token: ${{ steps.idtoken.outputs.result }}
           ###### End of Repository/Build Configurations ######
-        env:
-          VITE_KEYCLOAK_CLIENT_ID: spotify-client
-          VITE_KEYCLOAK_AUTHORITY: ${{ secrets.KEYCLOAK_AUTHORITY }}
-          VITE_KEYCLOAK_JWKS_URI: ${{ secrets.KEYCLOAK_JWKS_URI }}
-          VITE_API_URL: ${{ secrets.API_URL }}
-          VITE_SPOTIFY_CLIENT_ID: ${{ secrets.SPOTIFY_CLIENT_ID }}
-          VITE_SPOTIFY_REDIRECT_URI: ${{ secrets.FRONTEND_URL }}/settings
