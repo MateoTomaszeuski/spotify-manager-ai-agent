@@ -150,7 +150,7 @@ jobs:
             --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
             --name spotify-keycloak \
             --image quay.io/keycloak/keycloak:26.0 \
-            --location uswest2 \
+            --location westus2 \
             --dns-name-label spotify-keycloak-${{ secrets.AZURE_DNS_SUFFIX }} \
             --os-type Linux \
             --ports 8080 \
