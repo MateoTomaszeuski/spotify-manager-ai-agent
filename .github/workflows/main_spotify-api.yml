@@ -190,9 +190,9 @@ jobs:
               "KC_HOSTNAME=auth.tomaszeuski.com" \
               "KC_HOSTNAME_STRICT=false" \
               "KC_HOSTNAME_STRICT_BACKCHANNEL=false" \
+              "KC_HTTP_PORT=80" \
               "KC_PROXY=edge" \
               "KC_HTTP_ENABLED=true" \
-              "KC_HTTP_PORT=80" \
               "KC_HEALTH_ENABLED=true" \
               "KC_LOG_LEVEL=INFO" \
               "KC_LOG_CONSOLE_OUTPUT=default" \
