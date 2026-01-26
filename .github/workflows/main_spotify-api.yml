@@ -168,7 +168,7 @@ jobs:
             --environment-variables \
               "KEYCLOAK_ADMIN=admin" \
               "KC_DB=postgres" \
-              "KC_DB_URL=jdbc:postgresql://${{ secrets.POSTGRES_HOST }}/keycloakdb" \
+              "KC_DB_URL=jdbc:postgresql://${{ secrets.POSTGRES_HOST }}/keycloakdb?sslmode=require" \
               "KC_DB_USERNAME=${{ secrets.POSTGRES_USER }}" \
               "KC_HTTP_ENABLED=true" \
               "KC_HEALTH_ENABLED=true" \
