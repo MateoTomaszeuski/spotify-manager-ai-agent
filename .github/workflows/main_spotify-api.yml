@@ -154,6 +154,7 @@ jobs:
 
       - name: Deploy Keycloak to Azure Container Instances
         run: |
+          set +e
           az container create \
             --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
             --name spotify-keycloak \
@@ -179,18 +180,27 @@ jobs:
               "KC_DB_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" \
             --command-line "start-dev" \
             --restart-policy Always \
-            --verbose
+            --debug
+          
+          CREATE_EXIT_CODE=$?
+          echo "Container create exit code: $CREATE_EXIT_CODE"
+          set -e
 
-      - name: Wait for container to initialize
-        run: sleep 10
-
-      - name: Check Keycloak container logs
+      - name: Check container status and logs
         run: |
-          echo "Fetching Keycloak container logs..."
+          echo "=== Container Status ==="
+          az container show \
+            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+            --name spotify-keycloak \
+            --query "{name:name,state:instanceView.state,provisioningState:provisioningState,restartCount:instanceView.currentState.restartCount,events:instanceView.events}" \
+            --output json || echo "Failed to get container status"
+          
+          echo ""
+          echo "=== Container Logs ==="
           az container logs \
             --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
             --name spotify-keycloak \
-            --tail 100
+            || echo "No logs available yet"
 
       - name: Get Container IP and Update Database Firewall
         run: |
