@@ -131,7 +131,7 @@ jobs:
   deploy-keycloak:
     runs-on: ubuntu-latest
     needs: [backend-integration-tests, frontend-tests]
-    if: github.event_name != 'pull_request'
+    if: github.event_name != 'pull_request' && vars.DEPLOY_KEYCLOAK == 'true'
     permissions:
       id-token: write
       contents: read
@@ -151,6 +151,7 @@ jobs:
             --name spotify-keycloak \
             --image quay.io/keycloak/keycloak:26.0 \
             --dns-name-label spotify-keycloak-${{ secrets.AZURE_DNS_SUFFIX }} \
+            --os-type Linux \
             --ports 8080 \
             --cpu 1 \
             --memory 2 \
@@ -190,7 +191,7 @@ jobs:
 
   build-and-deploy:
     runs-on: windows-latest
-    needs: [backend-integration-tests, frontend-tests, deploy-keycloak]
+    needs: [backend-integration-tests, frontend-tests]
     if: github.event_name != 'pull_request'
     permissions:
       id-token: write
@@ -218,6 +219,25 @@ jobs:
           client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_E11D8A264184433CBE19677919D58C91 }}
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_F4ED1DD91E7E431585E099E24C964737 }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_3878F5AFEC344BC2B2E01C27B890EE86 }}
+
+      - name: Configure App Settings
+        run: |
+          az webapp config appsettings set \
+            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+            --name spotify-api \
+            --settings \
+              ASPNETCORE_ENVIRONMENT=Production \
+              ConnectionStrings__DefaultConnection="${{ secrets.POSTGRES_CONNECTION_STRING }}" \
+              Keycloak__Authority="${{ secrets.KEYCLOAK_AUTHORITY }}" \
+              Keycloak__Audience=account \
+              Keycloak__MetadataAddress="${{ secrets.KEYCLOAK_METADATA_ADDRESS }}" \
+              Keycloak__RequireHttpsMetadata=true \
+              Cors__AllowedOrigins__0="${{ secrets.FRONTEND_URL }}" \
+              AzureAI__Endpoint="${{ secrets.AZURE_AI_ENDPOINT }}" \
+              AzureAI__ApiKey="${{ secrets.AZURE_AI_API_KEY }}" \
+              AzureAI__Model="${{ secrets.AZURE_AI_MODEL }}" \
+              Spotify__ClientId="${{ secrets.SPOTIFY_CLIENT_ID }}" \
+              Spotify__ClientSecret="${{ secrets.SPOTIFY_CLIENT_SECRET }}"
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
