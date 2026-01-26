@@ -200,7 +200,7 @@ jobs:
             --secure-environment-variables \
               "KEYCLOAK_ADMIN_PASSWORD=${{ secrets.KEYCLOAK_ADMIN_PASSWORD }}" \
               "KC_DB_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" \
-            --command-line "start --optimized" \
+            --command-line "/opt/keycloak/bin/kc.sh start --optimized" \
             --restart-policy Always \
             --debug
           
