@@ -5,12 +5,21 @@ interface CTASectionProps {
 }
 
 export function CTASection({ onSignIn }: CTASectionProps) {
+  const handleSignIn = () => {
+    console.log('[CTASection] Sign-in button clicked');
+    try {
+      onSignIn();
+    } catch (error) {
+      console.error('[CTASection] Error during sign-in:', error);
+    }
+  };
+
   return (
     <>
       <Button
         variant="primary"
         size="lg"
-        onClick={onSignIn}
+        onClick={handleSignIn}
         className="w-full bg-linear-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-0.5"
       >
         <span className="flex items-center justify-center gap-2">
