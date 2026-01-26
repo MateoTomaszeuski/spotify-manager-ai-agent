@@ -171,11 +171,26 @@ jobs:
               "KC_DB_USERNAME=${{ secrets.POSTGRES_USER }}" \
               "KC_HTTP_ENABLED=true" \
               "KC_HEALTH_ENABLED=true" \
+              "KC_LOG_LEVEL=INFO" \
+              "KC_LOG_CONSOLE_OUTPUT=default" \
+              "QUARKUS_LOG_CONSOLE_ENABLE=true" \
             --secure-environment-variables \
               "KEYCLOAK_ADMIN_PASSWORD=${{ secrets.KEYCLOAK_ADMIN_PASSWORD }}" \
               "KC_DB_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" \
             --command-line "start-dev" \
-            --restart-policy Always
+            --restart-policy Always \
+            --verbose
+
+      - name: Wait for container to initialize
+        run: sleep 10
+
+      - name: Check Keycloak container logs
+        run: |
+          echo "Fetching Keycloak container logs..."
+          az container logs \
+            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+            --name spotify-keycloak \
+            --tail 100
 
       - name: Get Container IP and Update Database Firewall
         run: |
