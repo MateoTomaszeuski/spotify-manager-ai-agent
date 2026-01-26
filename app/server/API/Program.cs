@@ -5,6 +5,8 @@ using API.Middleware;
 using API.Repositories;
 using API.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Protocols;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -46,7 +48,7 @@ builder.Services.AddScoped<API.Interfaces.ITrackDiscoveryHelper, API.Services.He
 
 builder.Services.AddScoped<API.Interfaces.IPlaylistAnalyticsService, API.Services.Spotify.PlaylistAnalyticsService>();
 
-builder.Services.AddHttpClient<IAIService, AIService>();
+builder.Services.AddSingleton<IAIService, AIService>();
 builder.Services.AddHttpClient();
 builder.Services.AddHttpContextAccessor();
 
@@ -66,22 +68,40 @@ builder.Services.AddSignalR();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options => {
-        var authority = builder.Configuration["Keycloak:Authority"]
-                       ?? throw new InvalidOperationException("Keycloak:Authority is not configured");
         var metadataAddress = builder.Configuration["Keycloak:MetadataAddress"]
                              ?? throw new InvalidOperationException("Keycloak:MetadataAddress is not configured");
+        var requireHttpsMetadata = builder.Configuration.GetValue<bool?>("Keycloak:RequireHttpsMetadata") 
+                                  ?? !builder.Environment.IsDevelopment();
 
-        options.Authority = authority;
-        options.MetadataAddress = metadataAddress;
-        options.RequireHttpsMetadata = true;
+        options.RequireHttpsMetadata = requireHttpsMetadata;
         options.SaveToken = true;
+
+        var configurationManager = new ConfigurationManager<OpenIdConnectConfiguration>(
+            metadataAddress,
+            new OpenIdConnectConfigurationRetriever(),
+            new HttpDocumentRetriever()) {
+            AutomaticRefreshInterval = TimeSpan.FromHours(12),
+            RefreshInterval = TimeSpan.FromHours(1)
+        };
+
+        options.ConfigurationManager = configurationManager;
 
         options.TokenValidationParameters = new TokenValidationParameters {
             ValidateIssuer = true,
+            ValidIssuers = new[] { 
+                "http://keycloak:8080/realms/spotify",
+                "http://localhost:9090/realms/spotify"
+            },
             ValidateAudience = false,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            ClockSkew = TimeSpan.FromMinutes(5)
+            ClockSkew = TimeSpan.FromMinutes(5),
+            IssuerSigningKeyResolver = (token, securityToken, kid, parameters) => {
+                var httpClient = new HttpClient();
+                var jwksJson = httpClient.GetStringAsync("http://localhost:9090/realms/spotify/protocol/openid-connect/certs").Result;
+                var jwks = new JsonWebKeySet(jwksJson);
+                return jwks.Keys;
+            }
         };
 
         options.Events = new JwtBearerEvents {

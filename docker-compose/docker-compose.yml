@@ -8,15 +8,49 @@ services:
       - POSTGRES_USER=spotifyuser
       - POSTGRES_PASSWORD=spotifypass
       - POSTGRES_DB=spotifydb
+      - POSTGRES_MULTIPLE_DATABASES=spotifydb,keycloakdb
     ports:
       - "5432:5432"
     volumes:
       - ../app/db:/docker-entrypoint-initdb.d
+      - postgres_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U spotifyuser -d spotifydb"]
       interval: 5s
       timeout: 5s
       retries: 5
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.0
+    container_name: spotify-keycloak
+    restart: unless-stopped
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+      - KC_DB=postgres
+      - KC_DB_URL=jdbc:postgresql://postgres:5432/keycloakdb
+      - KC_DB_USERNAME=spotifyuser
+      - KC_DB_PASSWORD=spotifypass
+      - KC_HOSTNAME=localhost
+      - KC_HOSTNAME_PORT=9090
+      - KC_HOSTNAME_STRICT=false
+      - KC_HOSTNAME_STRICT_BACKCHANNEL=false
+      - KC_HTTP_ENABLED=true
+      - KC_HEALTH_ENABLED=true
+    ports:
+      - "9090:8080"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: start-dev
+    healthcheck:
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/8080;echo -e 'GET /health/ready HTTP/1.1\r\nhost: http://localhost\r\nConnection: close\r\n\r\n' >&3;if [ $? -eq 0 ]; then echo 'Healthcheck Successful';exit 0;else echo 'Healthcheck Failed';exit 1;fi;"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
 
   backend:
     container_name: spotify-backend
@@ -29,22 +63,28 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_HTTP_PORTS=8080
       - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=spotifydb;Username=spotifyuser;Password=spotifypass
-      - Keycloak__Authority=https://auth-dev.snowse.io/realms/DevRealm
+      - Keycloak__Authority=http://keycloak:9090/realms/spotify
       - Keycloak__Audience=account
-      - Keycloak__MetadataAddress=https://auth-dev.snowse.io/realms/DevRealm/.well-known/openid-configuration
+      - Keycloak__MetadataAddress=http://keycloak:9090/realms/spotify/.well-known/openid-configuration
+      - Keycloak__RequireHttpsMetadata=false
       - Cors__AllowedOrigins__0=http://localhost:5173
       - Cors__AllowedOrigins__1=https://localhost:5173
       - Cors__AllowedOrigins__2=https://127.0.0.1:5173
-      - Cors__AllowedOrigins__3=https://mateo-spotify.duckdns.org
-      - AI__ApiBaseUrl=${AI_API_BASE_URL}
-      - AI__Model=${AI_MODEL}
-      - AI__ApiKey=${AI_API_KEY}
+      - AzureAI__Endpoint=${AZURE_AI_ENDPOINT}
+      - AzureAI__ApiKey=${AZURE_AI_API_KEY}
+      - AzureAI__Model=${AZURE_AI_MODEL:-gpt-4o}
       - Spotify__ClientId=${SPOTIFY_CLIENT_ID}
       - Spotify__ClientSecret=${SPOTIFY_CLIENT_SECRET}
     ports:
       - "8080:8080"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+      - "localhost:host-gateway"
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
     command: sh -c "cd API && dotnet watch"
 
   frontend:
@@ -60,7 +100,13 @@ services:
       - backend
     environment:
       - NODE_ENV=development
+      - VITE_KEYCLOAK_CLIENT_ID=spotify-client
+      - VITE_KEYCLOAK_AUTHORITY=http://localhost:9090/realms/spotify
+      - VITE_KEYCLOAK_JWKS_URI=http://localhost:9090/realms/spotify/protocol/openid-connect/certs
+      - VITE_API_URL=http://localhost:8080
+      - VITE_SPOTIFY_CLIENT_ID=${SPOTIFY_CLIENT_ID}
+      - VITE_SPOTIFY_REDIRECT_URI=https://127.0.0.1:5173/settings
     command: sh -c "corepack enable && corepack prepare pnpm@latest --activate && pnpm install && pnpm run dev -- --host 0.0.0.0"
 
-# volumes:
-#   postgres_data:
+volumes:
+  postgres_data:

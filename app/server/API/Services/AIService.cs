@@ -1,26 +1,34 @@
-using System.Net.Http.Headers;
-using System.Text;
 using System.Text.Json;
 using API.Interfaces;
 using API.Models.AI;
+using Azure;
+using Azure.AI.OpenAI;
+using Azure.Identity;
+using OpenAI.Chat;
 
 namespace API.Services;
 
 public class AIService : IAIService {
-    private readonly HttpClient _httpClient;
+    private readonly AzureOpenAIClient _azureClient;
+    private readonly ChatClient _chatClient;
     private readonly ILogger<AIService> _logger;
-    private readonly string _apiBaseUrl;
-    private readonly string _apiKey;
     private readonly string _model;
     private const int SummaryTriggerTokens = 100000;
 
-    public AIService(HttpClient httpClient, IConfiguration configuration, ILogger<AIService> logger) {
-        _httpClient = httpClient;
+    public AIService(IConfiguration configuration, ILogger<AIService> logger) {
         _logger = logger;
 
-        _apiBaseUrl = configuration["AI:ApiBaseUrl"] ?? "https://ai-snow.reindeer-pinecone.ts.net/api/chat/completions";
-        _model = configuration["AI:Model"] ?? "gpt-oss-120b";
-        _apiKey = configuration["AI:ApiKey"] ?? throw new InvalidOperationException("AI:ApiKey is required in configuration");
+        var endpoint = configuration["AzureAI:Endpoint"] ?? throw new InvalidOperationException("AzureAI:Endpoint is required in configuration");
+        var apiKey = configuration["AzureAI:ApiKey"];
+        _model = configuration["AzureAI:Model"] ?? "gpt-4o";
+
+        if (!string.IsNullOrEmpty(apiKey)) {
+            _azureClient = new AzureOpenAIClient(new Uri(endpoint), new AzureKeyCredential(apiKey));
+        } else {
+            _azureClient = new AzureOpenAIClient(new Uri(endpoint), new DefaultAzureCredential());
+        }
+        
+        _chatClient = _azureClient.GetChatClient(_model);
     }
 
     public int EstimateTokenCount(string text) {
@@ -70,109 +78,85 @@ public class AIService : IAIService {
 
     public async Task<AIResponse> GetChatCompletionAsync(List<AIMessage> messages, List<AITool>? tools = null) {
         try {
-            var requestBody = new Dictionary<string, object> {
-                ["model"] = _model,
-                ["messages"] = messages.Select(m => {
-                    var msg = new Dictionary<string, object?> {
-                        ["role"] = m.Role,
-                        ["content"] = m.Content
-                    };
+            var chatMessages = new List<ChatMessage>();
 
-                    if (m.ToolCalls != null) {
-                        msg["tool_calls"] = m.ToolCalls;
-                    }
+            foreach (var msg in messages) {
+                switch (msg.Role.ToLower()) {
+                    case "system":
+                        chatMessages.Add(ChatMessage.CreateSystemMessage(msg.Content));
+                        break;
+                    case "user":
+                        chatMessages.Add(ChatMessage.CreateUserMessage(msg.Content));
+                        break;
+                    case "assistant":
+                        chatMessages.Add(ChatMessage.CreateAssistantMessage(msg.Content));
+                        break;
+                    case "tool":
+                        chatMessages.Add(ChatMessage.CreateToolMessage(msg.ToolCallId ?? "", msg.Content));
+                        break;
+                }
+            }
 
-                    if (!string.IsNullOrEmpty(m.ToolCallId)) {
-                        msg["tool_call_id"] = m.ToolCallId;
-                    }
-
-                    return msg;
-                }).ToList(),
-                ["temperature"] = 0.9,
-                ["top_p"] = 0.95
+            var completionOptions = new ChatCompletionOptions {
+                Temperature = 0.9f,
+                TopP = 0.95f
             };
 
             if (tools != null && tools.Count > 0) {
-                requestBody["tools"] = tools.Select(t => new Dictionary<string, object> {
-                    ["type"] = t.Type,
-                    ["function"] = new Dictionary<string, object> {
-                        ["name"] = t.Function.Name,
-                        ["description"] = t.Function.Description,
-                        ["parameters"] = t.Function.Parameters
-                    }
-                }).ToList();
+                foreach (var tool in tools) {
+                    var functionDefinition = ChatTool.CreateFunctionTool(
+                        tool.Function.Name,
+                        tool.Function.Description,
+                        BinaryData.FromString(JsonSerializer.Serialize(tool.Function.Parameters))
+                    );
+                    completionOptions.Tools.Add(functionDefinition);
+                }
             }
 
-            var options = new JsonSerializerOptions {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-            };
-            var jsonContent = JsonSerializer.Serialize(requestBody, options);
-            _logger.LogDebug("AI API Request: {Request}", jsonContent);
+            _logger.LogDebug("Azure OpenAI API Request - Model: {Model}, Messages: {MessageCount}", _model, chatMessages.Count);
 
-            var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+            var completion = await _chatClient.CompleteChatAsync(chatMessages, completionOptions);
 
-            _httpClient.DefaultRequestHeaders.Clear();
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _apiKey);
-
-            var response = await _httpClient.PostAsync(_apiBaseUrl, content);
-
-            if (!response.IsSuccessStatusCode) {
-                var errorText = await response.Content.ReadAsStringAsync();
-                _logger.LogError("AI API request failed: {StatusCode} {Error}", response.StatusCode, errorText);
-
-                var errorMessage = response.StatusCode switch {
-                    System.Net.HttpStatusCode.BadGateway => "AI service is temporarily unavailable (502 Bad Gateway). Please try again later.",
-                    System.Net.HttpStatusCode.ServiceUnavailable => "AI service is temporarily unavailable (503 Service Unavailable). Please try again later.",
-                    System.Net.HttpStatusCode.GatewayTimeout => "AI service request timed out (504 Gateway Timeout). Please try again later.",
-                    _ => $"AI API request failed: {response.StatusCode}"
-                };
-
-                return new AIResponse("", Error: errorMessage);
+            if (completion == null || completion.Value == null) {
+                return new AIResponse("", Error: "No response from Azure OpenAI service");
             }
 
-            var responseText = await response.Content.ReadAsStringAsync();
-            _logger.LogDebug("AI API Response: {Response}", responseText);
+            var result = completion.Value;
 
-            var responseData = JsonSerializer.Deserialize<JsonElement>(responseText);
-
-            if (!responseData.TryGetProperty("choices", out var choices) || choices.GetArrayLength() == 0) {
-                return new AIResponse("", Error: "No response from AI API");
-            }
-
-            var choice = choices[0];
-            var message = choice.GetProperty("message");
-
-            // Handle tool calls
-            if (message.TryGetProperty("tool_calls", out var toolCallsJson) && toolCallsJson.GetArrayLength() > 0) {
+            if (result.FinishReason == ChatFinishReason.ToolCalls && result.ToolCalls.Count > 0) {
                 var executedToolCalls = new List<ExecutedToolCall>();
 
-                foreach (var tc in toolCallsJson.EnumerateArray()) {
-                    var id = tc.GetProperty("id").GetString()!;
-                    var functionData = tc.GetProperty("function");
-                    var name = functionData.GetProperty("name").GetString()!;
-                    var argumentsJson = functionData.GetProperty("arguments").GetString()!;
+                foreach (var toolCall in result.ToolCalls) {
+                    if (toolCall.Kind == ChatToolCallKind.Function) {
+                        var arguments = JsonSerializer.Deserialize<Dictionary<string, object>>(toolCall.FunctionArguments)
+                            ?? new Dictionary<string, object>();
 
-                    var arguments = JsonSerializer.Deserialize<Dictionary<string, object>>(argumentsJson)
-                        ?? new Dictionary<string, object>();
-
-                    executedToolCalls.Add(new ExecutedToolCall(id, name, arguments));
+                        executedToolCalls.Add(new ExecutedToolCall(
+                            toolCall.Id,
+                            toolCall.FunctionName,
+                            arguments
+                        ));
+                    }
                 }
 
-                var messageContent = message.TryGetProperty("content", out var contentProp) && contentProp.ValueKind != JsonValueKind.Null
-                    ? contentProp.GetString()
-                    : null;
-
-                return new AIResponse(messageContent ?? "", executedToolCalls);
+                var content = result.Content.Count > 0 ? string.Join("", result.Content.Select(c => c.Text)) : "";
+                return new AIResponse(content, executedToolCalls);
             }
 
-            // Normal text response
-            if (!message.TryGetProperty("content", out var contentProperty) || contentProperty.ValueKind == JsonValueKind.Null) {
-                return new AIResponse("", Error: "No response content from AI API");
-            }
+            var responseContent = result.Content.Count > 0 ? string.Join("", result.Content.Select(c => c.Text)) : "";
+            return new AIResponse(responseContent);
+        } catch (RequestFailedException ex) {
+            _logger.LogError(ex, "Azure OpenAI service request failed: {StatusCode} {Message}", ex.Status, ex.Message);
 
-            return new AIResponse(contentProperty.GetString() ?? "");
+            var errorMessage = ex.Status switch {
+                429 => "Azure OpenAI service rate limit exceeded. Please try again later.",
+                503 => "Azure OpenAI service is temporarily unavailable. Please try again later.",
+                _ => $"Azure OpenAI service request failed: {ex.Message}"
+            };
+
+            return new AIResponse("", Error: errorMessage);
         } catch (Exception ex) {
-            _logger.LogError(ex, "AI Service error");
+            _logger.LogError(ex, "Azure OpenAI Service error");
             return new AIResponse("", Error: ex.Message);
         }
     }

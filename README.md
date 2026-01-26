@@ -1,10 +1,147 @@
 # Spotify Manager AI Agent
 
 ## Elevator Pitch
-An intelligent Spotify management assistant that automates playlist creation, music discovery, and library organization. Users can interact with an AI agent that creates custom playlists based on natural language descriptions, suggests personalized music recommendations, discovers new tracks aligned with their taste, and cleans up duplicate songs across playlists—all while maintaining full visibility and control over every action the agent performs.
+An intelligent Spotify management assistant that automates playlist creation, music discovery, and library organization using Azure AI services. Users can interact with an AI agent that creates custom playlists based on natural language descriptions, suggests personalized music recommendations, discovers new tracks aligned with their taste, and cleans up duplicate songs across playlists—all while maintaining full visibility and control over every action the agent performs.
 
 ## Contributors
 - Mateo Tomaszeuski
+
+## Technology Stack
+
+### Backend
+- **Runtime**: .NET 9.0 (C#)
+- **Database**: PostgreSQL 16
+- **Authentication**: Keycloak (OAuth 2.0/OIDC)
+- **AI Services**: Azure AI Services (Multi-service account)
+- **ORM**: Dapper
+- **Real-time**: SignalR (WebSockets)
+
+### Frontend
+- **Framework**: React 18 with TypeScript
+- **Build Tool**: Vite
+- **Styling**: Tailwind CSS v4
+- **State Management**: Zustand
+- **Package Manager**: pnpm
+
+### Deployment
+- **Containerization**: Docker & Docker Compose
+- **Database Initialization**: SQL init scripts
+
+## Prerequisites
+
+### Azure AI Services
+- Azure subscription
+- Azure AI Services multi-service account
+- Endpoint URL and API key
+
+### Spotify
+- Spotify Developer account
+- Application with OAuth credentials
+- Required scopes: playlist-read-private, playlist-modify-public, playlist-modify-private, user-library-read, user-top-read
+
+### Authentication
+- Keycloak instance (or compatible OIDC provider)
+- Configured realm and client
+
+## Quick Start
+
+### 1. Clone Repository
+```bash
+git clone https://github.com/your-username/spotify-manager-aI-agent.git
+cd spotify-manager-aI-agent
+```
+
+### 2. Configure Environment Variables
+
+#### Backend Configuration
+Create `/app/server/.env` based on `.env.example`:
+```bash
+# Keycloak Configuration
+Keycloak__Authority=https://your-keycloak-instance/realms/YourRealm
+Keycloak__Audience=account
+Keycloak__MetadataAddress=https://your-keycloak-instance/realms/YourRealm/.well-known/openid-configuration
+
+# CORS Configuration
+Cors__AllowedOrigins__0=http://localhost:5173
+
+# Azure AI Configuration
+AzureAI__Endpoint=https://your-resource-name.cognitiveservices.azure.com/
+AzureAI__ApiKey=your_azure_ai_api_key
+AzureAI__Model=gpt-4o
+
+# Spotify API Configuration
+Spotify__ClientId=your_spotify_client_id
+Spotify__ClientSecret=your_spotify_client_secret
+```
+
+#### Docker Compose Configuration
+Create `/docker-compose/.env`:
+```bash
+# Azure AI Services
+AZURE_AI_ENDPOINT=https://your-resource-name.cognitiveservices.azure.com/
+AZURE_AI_API_KEY=your_azure_ai_api_key
+AZURE_AI_MODEL=gpt-4o
+
+# Spotify API
+SPOTIFY_CLIENT_ID=your_spotify_client_id
+SPOTIFY_CLIENT_SECRET=your_spotify_client_secret
+```
+
+### 3. Run with Docker Compose
+```bash
+cd docker-compose
+docker-compose up
+```
+
+The application will be available at:
+- Frontend: http://localhost:5173
+- Backend API: http://localhost:8080
+- PostgreSQL: localhost:5432
+
+### 4. Development Mode
+
+#### Backend
+```bash
+cd app/server/API
+dotnet restore
+dotnet run
+```
+
+#### Frontend
+```bash
+cd app/client
+pnpm install
+pnpm dev
+```
+
+## Azure AI Services Setup
+
+1. **Create Azure AI Services Resource**
+   ```bash
+   az cognitiveservices account create \
+     --name your-resource-name \
+     --resource-group your-resource-group \
+     --kind CognitiveServices \
+     --sku S0 \
+     --location eastus
+   ```
+
+2. **Get Endpoint and Key**
+   ```bash
+   az cognitiveservices account show \
+     --name your-resource-name \
+     --resource-group your-resource-group \
+     --query "properties.endpoint"
+   
+   az cognitiveservices account keys list \
+     --name your-resource-name \
+     --resource-group your-resource-group
+   ```
+
+3. **Configure Model Deployment**
+   - The application uses the Azure AI Inference SDK
+   - Compatible with GPT-4o, GPT-4, GPT-3.5-turbo, and other Azure OpenAI models
+   - Update the `AzureAI__Model` setting to match your deployment
 
 ## Project Features
 
