@@ -7,13 +7,134 @@ on:
   push:
     branches:
       - main
+  pull_request:
   workflow_dispatch:
 
 jobs:
-  build:
+  backend-linting-and-warns:
+    runs-on: server
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check linting and warns
+        run: |
+          docker build \
+            -f dockerfiles/check.Dockerfile \
+            -t linting_and_warns_container \
+            .
+
+      - name: Remove linting image
+        if: always()
+        run: docker rmi linting_and_warns_container -f || true
+
+  backend-tests:
+    runs-on: server
+    needs: [backend-linting-and-warns]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build and run unit tests
+        run: |
+          docker build \
+            -f dockerfiles/tests.Dockerfile \
+            -t test_container \
+            .
+          docker run --rm test_container
+
+      - name: Remove test image
+        if: always()
+        run: docker rmi test_container -f || true
+
+  backend-integration-tests:
+    runs-on: server
+    needs: [backend-linting-and-warns, backend-tests]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Clean up existing containers
+        run: |
+          docker compose -f docker-compose/docker-compose.integration-tests.yml down -v || true
+          docker rmi integration_test_container || true
+
+      - name: Spin up Api and Database
+        run: docker compose -f docker-compose/docker-compose.integration-tests.yml up -d --build
+
+      - name: Build C# integration Tests
+        run: |
+          docker build \
+            -f dockerfiles/integration-tests.Dockerfile \
+            -t integration_test_container \
+            .
+
+      - name: Run C# integration tests
+        run: docker run --rm --network docker-compose_integration_tests_network integration_test_container
+
+      - name: Clean up containers
+        if: always()
+        run: |
+          docker compose -f docker-compose/docker-compose.integration-tests.yml down -v || true
+          docker rmi integration_test_container || true
+
+  frontend-linting:
+    runs-on: server
+    needs: [backend-tests]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+          cache-dependency-path: app/client/pnpm-lock.yaml
+
+      - name: Install frontend dependencies
+        run: cd app/client && pnpm install --frozen-lockfile
+
+      - name: Run ESLint
+        run: cd app/client && pnpm lint:ci
+
+  frontend-tests:
+    runs-on: server
+    needs: [frontend-linting]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Clean up existing containers
+        run: |
+          docker compose -f docker-compose/docker-compose.integration-tests.yml down -v || true
+
+      - name: Spin up Api and Database
+        run: docker compose -f docker-compose/docker-compose.integration-tests.yml up -d --build
+
+      - name: Build frontend test container
+        run: |
+          docker build \
+            -f dockerfiles/client-test.Dockerfile \
+            -t client_test_container \
+            .
+
+      - name: Run frontend tests
+        run: docker run --rm --network docker-compose_integration_tests_network client_test_container
+
+      - name: Clean up containers
+        if: always()
+        run: |
+          docker compose -f docker-compose/docker-compose.integration-tests.yml down -v || true
+          docker rmi client_test_container || true
+
+  build-and-deploy:
     runs-on: windows-latest
+    needs: [backend-integration-tests, frontend-tests]
+    if: github.event_name != 'pull_request'
     permissions:
-      contents: read #This is required for actions/checkout
+      id-token: write
+      contents: read
 
     steps:
       - uses: actions/checkout@v4
@@ -24,30 +145,13 @@ jobs:
           dotnet-version: '9.x'
 
       - name: Build with dotnet
+        working-directory: ./app/server
         run: dotnet build --configuration Release
 
       - name: dotnet publish
-        run: dotnet publish -c Release -o "${{env.DOTNET_ROOT}}/myapp"
+        working-directory: ./app/server
+        run: dotnet publish -c Release -o ./publish
 
-      - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v4
-        with:
-          name: .net-app
-          path: ${{env.DOTNET_ROOT}}/myapp
-
-  deploy:
-    runs-on: windows-latest
-    needs: build
-    permissions:
-      id-token: write #This is required for requesting the JWT
-      contents: read #This is required for actions/checkout
-
-    steps:
-      - name: Download artifact from build job
-        uses: actions/download-artifact@v4
-        with:
-          name: .net-app
-      
       - name: Login to Azure
         uses: azure/login@v2
         with:
@@ -61,5 +165,5 @@ jobs:
         with:
           app-name: 'spotify-api'
           slot-name: 'Production'
-          package: .
+          package: ./app/server/publish
           
