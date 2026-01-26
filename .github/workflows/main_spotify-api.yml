@@ -155,21 +155,21 @@ jobs:
             --os-type Linux \
             --ports 8080 \
             --cpu 1 \
-            --memory 2 \
+            --memory 1.5 \
             --environment-variables \
-              KEYCLOAK_ADMIN=admin \
-              KC_DB=postgres \
-              KC_DB_URL=jdbc:postgresql://${{ secrets.POSTGRES_HOST }}/keycloakdb \
-              KC_DB_USERNAME=${{ secrets.POSTGRES_USER }} \
-              KC_HOSTNAME=${{ secrets.KEYCLOAK_HOSTNAME }} \
-              KC_HOSTNAME_STRICT=false \
-              KC_HOSTNAME_STRICT_BACKCHANNEL=false \
-              KC_HTTP_ENABLED=true \
-              KC_HEALTH_ENABLED=true \
-              KC_PROXY=edge \
+              "KEYCLOAK_ADMIN=admin" \
+              "KC_DB=postgres" \
+              "KC_DB_URL=jdbc:postgresql://${{ secrets.POSTGRES_HOST }}/keycloakdb" \
+              "KC_DB_USERNAME=${{ secrets.POSTGRES_USER }}" \
+              "KC_HOSTNAME=${{ secrets.KEYCLOAK_HOSTNAME }}" \
+              "KC_HOSTNAME_STRICT=false" \
+              "KC_HOSTNAME_STRICT_BACKCHANNEL=false" \
+              "KC_HTTP_ENABLED=true" \
+              "KC_HEALTH_ENABLED=true" \
+              "KC_PROXY=edge" \
             --secure-environment-variables \
-              KEYCLOAK_ADMIN_PASSWORD=${{ secrets.KEYCLOAK_ADMIN_PASSWORD }} \
-              KC_DB_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} \
+              "KEYCLOAK_ADMIN_PASSWORD=${{ secrets.KEYCLOAK_ADMIN_PASSWORD }}" \
+              "KC_DB_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" \
             --command-line "start" \
             --restart-policy Always
 
