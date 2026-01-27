@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
-import { useAuth } from '../providers/GoogleAuthProvider';
+import { useAuth } from './useGoogleAuth';
 import { websocketService, type AgentStatusUpdate } from '../services/websocket';
 
 export function useWebSocket() {

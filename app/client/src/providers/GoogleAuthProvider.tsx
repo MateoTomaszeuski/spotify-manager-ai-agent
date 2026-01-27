@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import { createContext, useEffect, useState, useCallback } from 'react';
 import type { ReactNode } from 'react';
 
 declare global {
@@ -57,14 +57,6 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export { AuthContext };
-
-export function useAuth() {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within a GoogleAuthProvider');
-  }
-  return context;
-}
 
 interface GoogleAuthProviderProps {
   children: ReactNode;
