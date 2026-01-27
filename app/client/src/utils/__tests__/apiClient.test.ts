@@ -16,11 +16,8 @@ describe('ApiClient', () => {
 
   describe('Authentication', () => {
     it('should include auth token when available', async () => {
-      const mockToken = 'test-token-123';
-      sessionStorage.setItem(
-        'oidc.user:undefined:undefined',
-        JSON.stringify({ access_token: mockToken })
-      );
+      const mockToken = 'test-google-id-token-123';
+      sessionStorage.setItem('google_id_token', mockToken);
 
       mockFetch.mockResolvedValueOnce({
         ok: true,
