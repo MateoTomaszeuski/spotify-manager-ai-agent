@@ -1,12 +1,12 @@
 {
   "navigationFallback": {
     "rewrite": "/index.html",
-    "exclude": ["/assets/*"]
+    "exclude": ["/assets/*", "/*.js", "/*.css", "/*.json"]
   },
   "mimeTypes": {
     ".json": "application/json",
-    ".js": "application/javascript",
-    ".mjs": "application/javascript",
+    ".js": "text/javascript",
+    ".mjs": "text/javascript",
     ".css": "text/css",
     ".html": "text/html",
     ".svg": "image/svg+xml",
@@ -23,12 +23,35 @@
   },
   "globalHeaders": {
     "Access-Control-Allow-Origin": "*",
-    "X-Content-Type-Options": "nosniff"
+    "X-Content-Type-Options": "nosniff",
+    "Cache-Control": "no-cache"
   },
   "routes": [
     {
       "route": "/assets/*",
       "headers": {
+        "Cache-Control": "public, max-age=31536000, immutable",
+        "Content-Type": "text/javascript"
+      }
+    },
+    {
+      "route": "/*.js",
+      "headers": {
+        "Content-Type": "text/javascript",
+        "Cache-Control": "public, max-age=31536000, immutable"
+      }
+    },
+    {
+      "route": "/*.mjs",
+      "headers": {
+        "Content-Type": "text/javascript",
+        "Cache-Control": "public, max-age=31536000, immutable"
+      }
+    },
+    {
+      "route": "/*.css",
+      "headers": {
+        "Content-Type": "text/css",
         "Cache-Control": "public, max-age=31536000, immutable"
       }
     }
