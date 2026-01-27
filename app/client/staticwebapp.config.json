@@ -1,12 +1,12 @@
 {
   "navigationFallback": {
     "rewrite": "/index.html",
-    "exclude": ["/images/*.{png,jpg,gif,ico}", "/css/*", "/js/*"]
+    "exclude": ["/assets/*"]
   },
   "mimeTypes": {
     ".json": "application/json",
-    ".js": "text/javascript",
-    ".mjs": "text/javascript",
+    ".js": "application/javascript",
+    ".mjs": "application/javascript",
     ".css": "text/css",
     ".html": "text/html",
     ".svg": "image/svg+xml",
@@ -18,13 +18,19 @@
     ".woff": "font/woff",
     ".woff2": "font/woff2",
     ".ttf": "font/ttf",
-    ".eot": "application/vnd.ms-fontobject"
+    ".eot": "application/vnd.ms-fontobject",
+    ".wasm": "application/wasm"
+  },
+  "globalHeaders": {
+    "Access-Control-Allow-Origin": "*",
+    "X-Content-Type-Options": "nosniff"
   },
   "routes": [
     {
-      "route": "/*",
-      "serve": "/index.html",
-      "statusCode": 200
+      "route": "/assets/*",
+      "headers": {
+        "Cache-Control": "public, max-age=31536000, immutable"
+      }
     }
   ],
   "responseOverrides": {
