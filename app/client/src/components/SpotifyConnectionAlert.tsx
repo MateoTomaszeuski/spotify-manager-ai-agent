@@ -47,11 +47,13 @@ export function SpotifyConnectionAlert() {
           </div>
           <div className="ml-3 flex-1">
             <h3 className="text-sm font-medium text-theme-text">
-              Spotify Access Required
+              Spotify Access Not Authorized
             </h3>
             <div className="mt-2 text-sm text-theme-text opacity-80">
+              <p className="mb-2">
+                This application is currently limited to authorized users. Spotify restricts the number of users who can access their API during development mode (limited to 25 users).
+              </p>
               <p>
-                This application is currently limited to authorized users only. 
                 Please contact <a href="mailto:tomaszeuskm@gmail.com" className="underline hover:text-theme-accent">tomaszeuskm@gmail.com</a> to request access.
               </p>
             </div>

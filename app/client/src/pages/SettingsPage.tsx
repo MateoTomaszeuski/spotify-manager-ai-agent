@@ -20,6 +20,7 @@ export function SettingsPage() {
   const [spotifyStatus, setSpotifyStatus] = useState<{
     isConnected: boolean;
     isTokenValid: boolean;
+    isAuthorized: boolean;
     tokenExpiry?: string;
   } | null>(null);
   const [spotifyProfile, setSpotifyProfile] = useState<{
@@ -176,6 +177,14 @@ export function SettingsPage() {
   }, [updateSpotifyConnection]);
 
   const handleConnectSpotify = () => {
+    if (spotifyStatus && !spotifyStatus.isAuthorized) {
+      showToast.error(
+        'Spotify access not authorized. This application is limited to authorized users because Spotify restricts API access during development. Please contact tomaszeuskm@gmail.com to request access.',
+        { duration: 6000 }
+      );
+      return;
+    }
+
     const clientId = import.meta.env.VITE_SPOTIFY_CLIENT_ID;
     const redirectUri = import.meta.env.VITE_SPOTIFY_REDIRECT_URI || 'https://127.0.0.1:5173/settings';
 
@@ -289,20 +298,42 @@ export function SettingsPage() {
               </div>
             ) : (
               <div className="space-y-4">
-                <div className="text-center py-6">
-                  <div className="text-4xl mb-3">🔌</div>
-                  <p className="text-theme-text mb-1">Not Connected</p>
-                  <p className="text-sm text-theme-text opacity-70">
-                    Connect your Spotify account to enable playlist management and music discovery
-                  </p>
-                </div>
-                <Button 
-                  variant="primary" 
-                  onClick={handleConnectSpotify}
-                  className="w-full"
-                >
-                  Connect Spotify Account
-                </Button>
+                {spotifyStatus && !spotifyStatus.isAuthorized ? (
+                  <div className="bg-orange-500/10 border border-orange-500/30 rounded-lg p-6 text-center">
+                    <div className="text-4xl mb-3">🔒</div>
+                    <p className="text-theme-text font-medium mb-2">Spotify Access Not Authorized</p>
+                    <p className="text-sm text-theme-text opacity-80 mb-4">
+                      This application is currently limited to authorized users. Spotify restricts the number of users who can access their API during development (limited to 25 users).
+                    </p>
+                    <p className="text-sm text-theme-text opacity-80">
+                      Please contact{' '}
+                      <a 
+                        href="mailto:tomaszeuskm@gmail.com" 
+                        className="text-theme-accent underline hover:text-theme-accent/80"
+                      >
+                        tomaszeuskm@gmail.com
+                      </a>
+                      {' '}to request access.
+                    </p>
+                  </div>
+                ) : (
+                  <>
+                    <div className="text-center py-6">
+                      <div className="text-4xl mb-3">🔌</div>
+                      <p className="text-theme-text mb-1">Not Connected</p>
+                      <p className="text-sm text-theme-text opacity-70">
+                        Connect your Spotify account to enable playlist management and music discovery
+                      </p>
+                    </div>
+                    <Button 
+                      variant="primary" 
+                      onClick={handleConnectSpotify}
+                      className="w-full"
+                    >
+                      Connect Spotify Account
+                    </Button>
+                  </>
+                )}
               </div>
             )}
           </div>

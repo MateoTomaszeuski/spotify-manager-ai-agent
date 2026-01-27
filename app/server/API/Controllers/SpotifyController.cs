@@ -44,6 +44,14 @@ public class SpotifyController : ControllerBase {
             return this.UnauthorizedUser();
         }
 
+        if (!user.SpotifyAuthorized.HasValue) {
+            _logger.LogWarning("User {Email} attempted to connect Spotify without authorization", user.Email);
+            return StatusCode(403, new { 
+                error = "Spotify access not authorized",
+                message = "This application is currently limited to authorized users. Spotify limits the number of users who can access their API during development. Please contact tomaszeuskm@gmail.com to request access."
+            });
+        }
+
         _logger.LogInformation("Exchanging Spotify authorization code for user: {Email}", user.Email);
 
         try {
@@ -104,6 +112,14 @@ public class SpotifyController : ControllerBase {
         var user = this.GetCurrentUser();
         if (user == null) {
             return this.UnauthorizedUser();
+        }
+
+        if (!user.SpotifyAuthorized.HasValue) {
+            _logger.LogWarning("User {Email} attempted to connect Spotify without authorization", user.Email);
+            return StatusCode(403, new { 
+                error = "Spotify access not authorized",
+                message = "This application is currently limited to authorized users. Spotify limits the number of users who can access their API during development. Please contact tomaszeuskm@gmail.com to request access."
+            });
         }
 
         _logger.LogInformation("Connecting Spotify account for user: {Email}", user.Email);

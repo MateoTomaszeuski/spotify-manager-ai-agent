@@ -27,6 +27,10 @@ public class SpotifyTokenService : ISpotifyTokenService {
     }
 
     public async Task<string> GetValidAccessTokenAsync(User user) {
+        if (!user.SpotifyAuthorized.HasValue) {
+            throw new UnauthorizedAccessException("Spotify access not authorized. This application is limited to authorized users due to Spotify API restrictions. Please contact the administrator to request access.");
+        }
+
         if (string.IsNullOrEmpty(user.SpotifyAccessToken)) {
             throw new InvalidOperationException("Spotify account not connected");
         }

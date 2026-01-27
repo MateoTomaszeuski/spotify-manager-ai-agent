@@ -21,6 +21,7 @@ interface GoogleIdConfiguration {
   callback: (response: CredentialResponse) => void;
   auto_select?: boolean;
   cancel_on_tap_outside?: boolean;
+  use_fedcm_for_prompt?: boolean;
 }
 
 interface GoogleButtonConfiguration {
@@ -118,6 +119,7 @@ export function GoogleAuthProvider({ children }: GoogleAuthProviderProps) {
           client_id: clientId,
           callback: handleCredentialResponse,
           auto_select: false,
+          use_fedcm_for_prompt: import.meta.env.PROD,
         });
         setIsLoading(false);
       }
