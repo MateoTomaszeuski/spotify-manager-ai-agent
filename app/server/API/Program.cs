@@ -53,10 +53,12 @@ builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddCors(options => {
     options.AddDefaultPolicy(policy => {
-        var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
-                             ?? new[] { "http://localhost:5173" };
-
-        policy.WithOrigins(allowedOrigins)
+        policy.WithOrigins(
+                  "http://localhost:5173",
+                  "https://localhost:5173",
+                  "https://127.0.0.1:5173",
+                  "https://spotify.mateo.tomaszeuski.com"
+              )
               .AllowAnyMethod()
               .AllowAnyHeader()
               .AllowCredentials();
