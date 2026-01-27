@@ -8,12 +8,18 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Cryptography;
 
-var builder = WebApplication.CreateBuilder(args);
+try
+{
+    Console.WriteLine("Starting application configuration...");
+    var builder = WebApplication.CreateBuilder(args);
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
-                       ?? throw new InvalidOperationException("ConnectionString 'DefaultConnection' is not configured");
+    Console.WriteLine("Checking configuration...");
+    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+                           ?? throw new InvalidOperationException("ConnectionString 'DefaultConnection' is not configured");
+    
+    Console.WriteLine("Connection string configured successfully");
 
-builder.Services.AddSingleton<IDbConnectionFactory>(new DbConnectionFactory(connectionString));
+    builder.Services.AddSingleton<IDbConnectionFactory>(new DbConnectionFactory(connectionString));
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IConversationRepository, ConversationRepository>();
@@ -56,14 +62,12 @@ builder.Services.AddCors(options => {
         var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
                              ?? new[] { "http://localhost:5173" };
 
-        var logger = LoggerFactory.Create(b => b.AddConsole()).CreateLogger("Startup");
-        logger.LogInformation("Configuring CORS with origins: {Origins}", string.Join(", ", allowedOrigins));
+        Console.WriteLine($"CORS Configuration - Allowed Origins: {string.Join(", ", allowedOrigins)}");
 
         policy.WithOrigins(allowedOrigins)
               .AllowAnyMethod()
               .AllowAnyHeader()
-              .AllowCredentials()
-              .SetIsOriginAllowedToAllowWildcardSubdomains();
+              .AllowCredentials();
     });
 });
 
@@ -114,6 +118,9 @@ builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
+Console.WriteLine($"Environment: {app.Environment.EnvironmentName}");
+Console.WriteLine("Application starting...");
+
 if (app.Environment.IsDevelopment()) {
     app.MapOpenApi();
 }
@@ -125,9 +132,17 @@ app.UseAuthorization();
 
 app.UseMiddleware<UserContextMiddleware>();
 app.MapGet("/", () => "API is running!");
-app.MapControllers().RequireAuthorization();
-app.MapHub<AgentHub>("/hubs/agent").RequireAuthorization();
+    app.MapControllers().RequireAuthorization();
+    app.MapHub<AgentHub>("/hubs/agent").RequireAuthorization();
 
-app.Run();
+    Console.WriteLine("Application started successfully!");
+    app.Run();
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"FATAL ERROR during startup: {ex.Message}");
+    Console.WriteLine($"Stack trace: {ex.StackTrace}");
+    throw;
+}
 
 public partial class Program { }
