@@ -1,42 +1,22 @@
 {
   "navigationFallback": {
     "rewrite": "/index.html",
-    "exclude": ["/assets/*"]
+    "exclude": ["/assets/*", "*.js", "*.css", "*.png", "*.jpg", "*.svg"]
   },
   "platform": {
     "apiRuntime": "node:18"
   },
   "routes": [
     {
-      "route": "/assets/*.js",
+      "route": "/assets/*",
       "headers": {
-        "Content-Type": "text/javascript; charset=utf-8",
         "Cache-Control": "public, max-age=31536000, immutable"
-      }
-    },
-    {
-      "route": "/assets/*.css",
-      "headers": {
-        "Content-Type": "text/css; charset=utf-8",
-        "Cache-Control": "public, max-age=31536000, immutable"
-      }
-    },
-    {
-      "route": "/*.js",
-      "headers": {
-        "Content-Type": "text/javascript; charset=utf-8"
-      }
-    },
-    {
-      "route": "/*.mjs",
-      "headers": {
-        "Content-Type": "text/javascript; charset=utf-8"
       }
     }
   ],
   "mimeTypes": {
-    ".js": "text/javascript",
-    ".mjs": "text/javascript",
+    ".js": "application/javascript",
+    ".mjs": "application/javascript",
     ".json": "application/json",
     ".css": "text/css",
     ".html": "text/html",
@@ -53,8 +33,7 @@
     ".wasm": "application/wasm"
   },
   "globalHeaders": {
-    "X-Content-Type-Options": "nosniff",
-    "X-Frame-Options": "DENY"
+    "X-Content-Type-Options": "nosniff"
   },
   "responseOverrides": {
     "404": {
