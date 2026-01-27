@@ -12,7 +12,7 @@ on:
 
 jobs:
   backend-linting-and-warns:
-    runs-on: server
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
@@ -28,7 +28,7 @@ jobs:
         run: docker rmi linting_and_warns_container -f || true
 
   backend-tests:
-    runs-on: server
+    runs-on: ubuntu-latest
     needs: [backend-linting-and-warns]
     steps:
       - uses: actions/checkout@v4
@@ -46,7 +46,7 @@ jobs:
         run: docker rmi test_container -f || true
 
   backend-integration-tests:
-    runs-on: server
+    runs-on: ubuntu-latest
     needs: [backend-linting-and-warns, backend-tests]
     steps:
       - uses: actions/checkout@v4
@@ -76,7 +76,7 @@ jobs:
           docker rmi integration_test_container || true
 
   frontend-linting:
-    runs-on: server
+    runs-on: ubuntu-latest
     needs: [backend-tests]
     steps:
       - uses: actions/checkout@v4
@@ -100,7 +100,7 @@ jobs:
         run: cd app/client && pnpm lint:ci
 
   frontend-tests:
-    runs-on: server
+    runs-on: ubuntu-latest
     needs: [frontend-linting]
     steps:
       - uses: actions/checkout@v4
