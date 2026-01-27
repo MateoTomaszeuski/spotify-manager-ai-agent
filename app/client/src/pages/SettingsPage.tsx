@@ -6,7 +6,7 @@ import { useUserStore } from '../stores/useUserStore';
 import { useAgentStore } from '../stores/useAgentStore';
 import { useUIStore } from '../stores/useUIStore';
 import { spotifyApi, agentApi } from '../services/api';
-import { useAuth } from 'react-oidc-context';
+import { useAuth } from '../hooks/useGoogleAuth';
 import toast from 'react-hot-toast';
 import { showToast } from '../utils/toast';
 
@@ -218,24 +218,20 @@ export function SettingsPage() {
         <h1 className="text-3xl font-bold text-theme-text mb-8">Settings</h1>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Keycloak Account */}
+          {/* Google Account */}
           <div className="bg-theme-card rounded-lg shadow p-6">
             <h2 className="text-xl font-semibold text-theme-text mb-4 flex items-center gap-2">
               <span className="text-2xl">👤</span>
-              Keycloak Account
+              Google Account
             </h2>
             <div className="space-y-3">
               <div>
                 <label className="text-xs font-medium text-theme-text opacity-70 uppercase tracking-wide">Name</label>
-                <p className="text-theme-text mt-1">{auth.user?.profile?.name || 'Not set'}</p>
+                <p className="text-theme-text mt-1">{auth.user?.name || 'Not set'}</p>
               </div>
               <div>
                 <label className="text-xs font-medium text-theme-text opacity-70 uppercase tracking-wide">Email</label>
-                <p className="text-theme-text mt-1">{auth.user?.profile?.email || 'Not set'}</p>
-              </div>
-              <div>
-                <label className="text-xs font-medium text-theme-text opacity-70 uppercase tracking-wide">Username</label>
-                <p className="text-theme-text mt-1">{auth.user?.profile?.preferred_username || 'Not set'}</p>
+                <p className="text-theme-text mt-1">{auth.user?.email || 'Not set'}</p>
               </div>
             </div>
           </div>

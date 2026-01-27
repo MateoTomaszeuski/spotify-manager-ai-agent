@@ -1,6 +1,6 @@
 -- Seed data for development and testing
 
--- Note: In production, users will be created automatically via Keycloak authentication
+-- Note: In production, users will be created automatically via Google authentication
 -- This seed data is for local development testing only
 
 -- Example user (replace with your actual test user email)

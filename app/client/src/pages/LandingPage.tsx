@@ -1,4 +1,4 @@
-import { useAuth } from 'react-oidc-context';
+import { useAuth } from '../hooks/useGoogleAuth';
 import { useEffect } from 'react';
 import { AuthLayout } from '../components/layout/AuthLayout';
 import { HeroSection } from '../components/landing/HeroSection';
@@ -12,14 +12,8 @@ export function LandingPage() {
     console.log('[LandingPage] Auth state:', {
       isLoading: auth.isLoading,
       isAuthenticated: auth.isAuthenticated,
-      error: auth.error,
-      activeNavigator: auth.activeNavigator,
     });
-    
-    if (auth.error) {
-      console.error('[LandingPage] Auth error:', auth.error);
-    }
-  }, [auth.isLoading, auth.isAuthenticated, auth.error, auth.activeNavigator]);
+  }, [auth.isLoading, auth.isAuthenticated]);
 
   if (auth.isAuthenticated) {
     console.log('[LandingPage] User authenticated, redirecting to dashboard');
@@ -27,14 +21,9 @@ export function LandingPage() {
     return null;
   }
 
-  const handleSignIn = async () => {
-    console.log('[LandingPage] Initiating sign-in redirect');
-    try {
-      await auth.signinRedirect();
-      console.log('[LandingPage] Sign-in redirect initiated successfully');
-    } catch (error) {
-      console.error('[LandingPage] Error during signinRedirect:', error);
-    }
+  const handleSignIn = () => {
+    console.log('[LandingPage] Initiating Google sign-in');
+    auth.signIn();
   };
 
   return (

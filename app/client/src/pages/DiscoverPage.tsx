@@ -8,7 +8,7 @@ import { AgentStatusBanner } from '../components/playlist-creator/AgentStatusBan
 import { useAgent } from '../hooks/useAgent';
 import { useAgentStore } from '../stores/useAgentStore';
 import { spotifyApi } from '../services/api';
-import { useAuth } from 'react-oidc-context';
+import { useAuth } from '../hooks/useGoogleAuth';
 import type { AgentActionResult } from '../types/api';
 
 export function DiscoverPage() {

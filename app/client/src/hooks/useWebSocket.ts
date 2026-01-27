@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
-import { useAuth } from 'react-oidc-context';
+import { useAuth } from '../providers/GoogleAuthProvider';
 import { websocketService, type AgentStatusUpdate } from '../services/websocket';
 
 export function useWebSocket() {
@@ -8,30 +8,30 @@ export function useWebSocket() {
   const [latestStatus, setLatestStatus] = useState<AgentStatusUpdate | null>(null);
 
   const connect = useCallback(async () => {
-    if (!auth.user?.access_token || !auth.user?.profile?.email) {
+    if (!auth.idToken || !auth.user?.email) {
       console.warn('❌ Cannot connect to WebSocket: no auth token or email');
       console.log('Auth state:', { 
         isAuthenticated: auth.isAuthenticated, 
-        hasToken: !!auth.user?.access_token,
-        hasEmail: !!auth.user?.profile?.email 
+        hasToken: !!auth.idToken,
+        hasEmail: !!auth.user?.email 
       });
       return;
     }
 
     console.log('🔌 Attempting WebSocket connection...', {
-      email: auth.user.profile.email,
-      hasToken: !!auth.user.access_token
+      email: auth.user.email,
+      hasToken: !!auth.idToken
     });
 
     try {
-      await websocketService.connect(auth.user.access_token, auth.user.profile.email);
+      await websocketService.connect(auth.idToken, auth.user.email);
       setIsConnected(true);
       console.log('✅ WebSocket connected successfully');
     } catch (error) {
       console.error('❌ Failed to connect WebSocket:', error);
       setIsConnected(false);
     }
-  }, [auth.isAuthenticated, auth.user?.access_token, auth.user?.profile?.email]);
+  }, [auth.isAuthenticated, auth.idToken, auth.user?.email]);
 
   const disconnect = useCallback(async () => {
     await websocketService.disconnect();
@@ -41,10 +41,10 @@ export function useWebSocket() {
   useEffect(() => {
     console.log('🔄 useWebSocket effect triggered', {
       isAuthenticated: auth.isAuthenticated,
-      hasToken: !!auth.user?.access_token
+      hasToken: !!auth.idToken
     });
     
-    if (auth.isAuthenticated && auth.user?.access_token) {
+    if (auth.isAuthenticated && auth.idToken) {
       connect();
     }
 

@@ -1,4 +1,4 @@
-import { useAuth } from 'react-oidc-context';
+import { useAuth } from '../../hooks/useGoogleAuth';
 import { useUIStore } from '../../stores/useUIStore';
 import { Button } from '../forms/Button';
 
@@ -38,26 +38,15 @@ export function Header() {
         <div className="flex items-center gap-4">
           <div className="text-right hidden sm:block">
             <p className="text-sm font-medium text-theme-text">
-              {auth.user?.profile?.name || 'User'}
+              {auth.user?.name || 'User'}
             </p>
-            <p className="text-xs text-theme-text opacity-70">{auth.user?.profile?.email}</p>
+            <p className="text-xs text-theme-text opacity-70">{auth.user?.email}</p>
           </div>
           <Button
             variant="primary"
-            onClick={async () => {
-              try {
-                // Remove user from session
-                await auth.removeUser();
-                // Clear session storage
-                sessionStorage.clear();
-                // Redirect to home
-                window.location.href = '/';
-              } catch (error) {
-                console.error('Logout error:', error);
-                // Force clear and redirect
-                sessionStorage.clear();
-                window.location.href = '/';
-              }
+            onClick={() => {
+              auth.signOut();
+              window.location.href = '/';
             }}
           >
             Logout

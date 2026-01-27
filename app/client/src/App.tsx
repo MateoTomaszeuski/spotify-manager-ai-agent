@@ -1,8 +1,8 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { useEffect } from 'react';
-import { useAuth } from 'react-oidc-context';
-import { KeycloakProvider } from './providers/KeycloakProvider';
+import { useAuth } from './hooks/useGoogleAuth';
+import { GoogleAuthProvider } from './providers/GoogleAuthProvider';
 import { AgentTimerProvider } from './providers/AgentTimerProvider';
 import { WebSocketProvider } from './providers/WebSocketProvider';
 import { ThemeProvider } from './contexts/ThemeContext';
@@ -27,7 +27,7 @@ function AppContent() {
 
   useEffect(() => {
     if (auth.isAuthenticated && auth.user) {
-      const name = auth.user.profile.name || auth.user.profile.preferred_username || 'User';
+      const name = auth.user.name || 'User';
       showToast.success(`Welcome, ${name}!`);
     }
   }, [auth.isAuthenticated, auth.user]);
@@ -152,7 +152,7 @@ function AppContent() {
 function App() {
   return (
     <ErrorBoundary>
-      <KeycloakProvider>
+      <GoogleAuthProvider>
         <ThemeProvider>
           <AgentTimerProvider>
             <WebSocketProvider>
@@ -160,7 +160,7 @@ function App() {
             </WebSocketProvider>
           </AgentTimerProvider>
         </ThemeProvider>
-      </KeycloakProvider>
+      </GoogleAuthProvider>
     </ErrorBoundary>
   );
 }

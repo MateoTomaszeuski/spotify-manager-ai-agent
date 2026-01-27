@@ -8,7 +8,7 @@ import { RecentPlaylists } from '../components/playlist-creator/RecentPlaylists'
 import { useAgent } from '../hooks/useAgent';
 import { useAgentStore } from '../stores/useAgentStore';
 import { spotifyApi, agentApi } from '../services/api';
-import { useAuth } from 'react-oidc-context';
+import { useAuth } from '../hooks/useGoogleAuth';
 import { showToast } from '../utils/toast';
 import type { PlaylistPreferences } from '../types/api';
 

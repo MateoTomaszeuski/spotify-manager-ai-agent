@@ -1,4 +1,4 @@
-import { useAuth } from 'react-oidc-context';
+import { useAuth } from '../hooks/useGoogleAuth';
 import { Navigate } from 'react-router-dom';
 import type { ReactNode } from 'react';
 

@@ -32,9 +32,7 @@ jobs:
         uses: Azure/static-web-apps-deploy@v1
         env:
           VITE_API_URL: ${{ secrets.VITE_API_URL }}
-          VITE_KEYCLOAK_AUTHORITY: ${{ secrets.VITE_KEYCLOAK_AUTHORITY }}
-          VITE_KEYCLOAK_CLIENT_ID: ${{ secrets.VITE_KEYCLOAK_CLIENT_ID }}
-          VITE_KEYCLOAK_JWKS_URI: ${{ secrets.VITE_KEYCLOAK_JWKS_URI }}
+          VITE_GOOGLE_CLIENT_ID: ${{ secrets.VITE_GOOGLE_CLIENT_ID }}
           VITE_SPOTIFY_CLIENT_ID: ${{ secrets.VITE_SPOTIFY_CLIENT_ID }}
           VITE_SPOTIFY_REDIRECT_URI: ${{ secrets.VITE_SPOTIFY_REDIRECT_URI }}
         with:

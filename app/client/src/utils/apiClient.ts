@@ -8,21 +8,8 @@ class ApiClient {
   }
 
   private async getAuthToken(): Promise<string | null> {
-    const oidcStorage = sessionStorage.getItem(
-      `oidc.user:${config.keycloak.authority}:${config.keycloak.clientId}`
-    );
-
-    if (!oidcStorage) {
-      return null;
-    }
-
-    try {
-      const user = JSON.parse(oidcStorage);
-      return user.access_token;
-    } catch (error) {
-      console.error('Failed to parse OIDC storage:', error);
-      return null;
-    }
+    const idToken = sessionStorage.getItem('google_id_token');
+    return idToken;
   }
 
   private async request<T>(

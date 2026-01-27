@@ -1,4 +1,4 @@
-import { useAuth } from 'react-oidc-context';
+import { useAuth } from '../../hooks/useGoogleAuth';
 import { Link, useLocation } from 'react-router-dom';
 import { useUIStore } from '../../stores/useUIStore';
 import { useTheme } from '../../contexts/ThemeContext';
@@ -38,7 +38,7 @@ export function Sidebar() {
         <div className="p-4 flex flex-col h-full">
           <div className="mb-8 shrink-0">
             <h1 className="text-2xl font-bold text-theme-accent whitespace-nowrap">Spotify Agent</h1>
-            <p className={`text-sm opacity-70 truncate ${hasCustomTheme ? 'text-theme-text' : 'text-gray-50'}`}>{auth.user?.profile?.email}</p>
+            <p className={`text-sm opacity-70 truncate ${hasCustomTheme ? 'text-theme-text' : 'text-gray-50'}`}>{auth.user?.email}</p>
           </div>
           
           <nav className="flex-1 overflow-y-auto">
@@ -103,7 +103,7 @@ export function Sidebar() {
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h1 className="text-xl font-bold">Spotify Agent</h1>
-                <p className={`text-xs opacity-70 truncate ${hasCustomTheme ? 'text-theme-text' : 'text-gray-50'}`}>{auth.user?.profile?.email}</p>
+                <p className={`text-xs opacity-70 truncate ${hasCustomTheme ? 'text-theme-text' : 'text-gray-50'}`}>{auth.user?.email}</p>
               </div>
               <button
                 onClick={toggleSidebar}

@@ -1,7 +1,6 @@
 #!/bin/bash
 set -e
 
-psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-EOSQL
-    CREATE DATABASE keycloakdb;
-    GRANT ALL PRIVILEGES ON DATABASE keycloakdb TO spotifyuser;
-EOSQL
+# Database is already created via POSTGRES_DB environment variable
+# This script is kept for potential future multi-database needs
+echo "PostgreSQL initialization complete"

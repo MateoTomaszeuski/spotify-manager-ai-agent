@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 import type { ThemeData } from '../types/theme';
 import { themeApi } from '../services/api';
-import { useAuth } from 'react-oidc-context';
+import { useAuth } from '../hooks/useGoogleAuth';
 
 interface ThemeContextType {
   theme: ThemeData | null;

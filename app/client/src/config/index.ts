@@ -1,8 +1,6 @@
 export const config = {
-  keycloak: {
-    clientId: import.meta.env.VITE_KEYCLOAK_CLIENT_ID,
-    authority: import.meta.env.VITE_KEYCLOAK_AUTHORITY,
-    jwksUri: import.meta.env.VITE_KEYCLOAK_JWKS_URI,
+  google: {
+    clientId: import.meta.env.VITE_GOOGLE_CLIENT_ID,
   },
   api: {
     baseUrl: import.meta.env.VITE_API_URL,
@@ -10,10 +8,8 @@ export const config = {
 } as const;
 
 const configStatus = {
-  keycloak: {
-    clientId: config.keycloak.clientId || '❌ MISSING',
-    authority: config.keycloak.authority || '❌ MISSING',
-    jwksUri: config.keycloak.jwksUri || '❌ MISSING',
+  google: {
+    clientId: config.google.clientId || '❌ MISSING',
   },
   api: {
     baseUrl: config.api.baseUrl || '❌ MISSING',
@@ -23,8 +19,8 @@ const configStatus = {
 console.log('[Config] Environment:', import.meta.env.MODE);
 console.log('[Config] App Configuration:', configStatus);
 
-if (!config.keycloak.clientId || !config.keycloak.authority) {
-  console.error('[Config] ⚠️ CRITICAL: Keycloak configuration is incomplete!');
+if (!config.google.clientId) {
+  console.error('[Config] ⚠️ CRITICAL: Google OAuth configuration is incomplete!');
   console.error('[Config] Missing values will cause authentication to fail.');
   console.error('[Config] Please ensure environment variables are set during build.');
 }
