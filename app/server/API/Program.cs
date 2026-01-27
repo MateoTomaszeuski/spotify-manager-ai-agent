@@ -121,8 +121,8 @@ app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.UseMiddleware<UserContextMiddleware>();
 app.MapGet("/", () => "API is running!");
+app.UseMiddleware<UserContextMiddleware>();
 app.MapControllers().RequireAuthorization();
 app.MapHub<AgentHub>("/hubs/agent").RequireAuthorization();
 

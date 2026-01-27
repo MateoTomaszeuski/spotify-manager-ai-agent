@@ -23,11 +23,15 @@ public class UserContextMiddleware {
                       ?? context.User.FindFirst("preferred_username")?.Value;
 
             if (!string.IsNullOrEmpty(email)) {
-                var user = await userService.GetOrCreateUserAsync(email, name);
-                context.Items["User"] = user;
-                context.Items["UserEmail"] = email;
+                try {
+                    var user = await userService.GetOrCreateUserAsync(email, name);
+                    context.Items["User"] = user;
+                    context.Items["UserEmail"] = email;
 
-                _logger.LogInformation("Authenticated request from user: {Email}", email);
+                    _logger.LogDebug("Authenticated request from user: {Email}", email);
+                } catch (Exception ex) {
+                    _logger.LogError(ex, "Failed to get or create user for email: {Email}", email);
+                }
             } else {
                 _logger.LogWarning("Authenticated user has no email claim");
             }
