@@ -8,18 +8,12 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Cryptography;
 
-try
-{
-    Console.WriteLine("Starting application configuration...");
-    var builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder(args);
 
-    Console.WriteLine("Checking configuration...");
-    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
-                           ?? throw new InvalidOperationException("ConnectionString 'DefaultConnection' is not configured");
-    
-    Console.WriteLine("Connection string configured successfully");
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+                       ?? throw new InvalidOperationException("ConnectionString 'DefaultConnection' is not configured");
 
-    builder.Services.AddSingleton<IDbConnectionFactory>(new DbConnectionFactory(connectionString));
+builder.Services.AddSingleton<IDbConnectionFactory>(new DbConnectionFactory(connectionString));
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IConversationRepository, ConversationRepository>();
@@ -61,8 +55,6 @@ builder.Services.AddCors(options => {
     options.AddDefaultPolicy(policy => {
         var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
                              ?? new[] { "http://localhost:5173" };
-
-        Console.WriteLine($"CORS Configuration - Allowed Origins: {string.Join(", ", allowedOrigins)}");
 
         policy.WithOrigins(allowedOrigins)
               .AllowAnyMethod()
@@ -118,8 +110,12 @@ builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
-Console.WriteLine($"Environment: {app.Environment.EnvironmentName}");
-Console.WriteLine("Application starting...");
+var logger = app.Services.GetRequiredService<ILogger<Program>>();
+var allowedOrigins = app.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? new[] { "http://localhost:5173" };
+
+logger.LogInformation("=== Application Starting ===");
+logger.LogInformation("Environment: {Environment}", app.Environment.EnvironmentName);
+logger.LogInformation("CORS Allowed Origins: {Origins}", string.Join(", ", allowedOrigins));
 
 if (app.Environment.IsDevelopment()) {
     app.MapOpenApi();
@@ -132,17 +128,17 @@ app.UseAuthorization();
 
 app.UseMiddleware<UserContextMiddleware>();
 app.MapGet("/", () => "API is running!");
-    app.MapControllers().RequireAuthorization();
-    app.MapHub<AgentHub>("/hubs/agent").RequireAuthorization();
+app.MapGet("/debug/config", (IConfiguration config) => {
+    var origins = config.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? new[] { "none" };
+    return new { 
+        Environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT"),
+        CorsOrigins = origins,
+        AllConfigKeys = config.AsEnumerable().Where(x => x.Key.Contains("Cors")).ToDictionary(x => x.Key, x => x.Value)
+    };
+});
+app.MapControllers().RequireAuthorization();
+app.MapHub<AgentHub>("/hubs/agent").RequireAuthorization();
 
-    Console.WriteLine("Application started successfully!");
-    app.Run();
-}
-catch (Exception ex)
-{
-    Console.WriteLine($"FATAL ERROR during startup: {ex.Message}");
-    Console.WriteLine($"Stack trace: {ex.StackTrace}");
-    throw;
-}
-
+logger.LogInformation("=== Application Started Successfully ===");
+app.Run();
 public partial class Program { }
