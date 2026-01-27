@@ -14,6 +14,8 @@ jobs:
     runs-on: ubuntu-latest
     name: Build and Deploy Job
     if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
+    env:
+      NODE_VERSION: '20.x'
     permissions:
        id-token: write
        contents: read
@@ -22,6 +24,10 @@ jobs:
         with:
           submodules: true
           lfs: false
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
       - name: Install OIDC Client from Core Package
         run: npm install @actions/core@1.6.0 @actions/http-client
       - name: Get Id Token

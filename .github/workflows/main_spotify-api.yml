@@ -98,9 +98,32 @@ jobs:
       - name: Run ESLint
         run: cd app/client && pnpm lint:ci
 
+  frontend-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+          cache-dependency-path: app/client/pnpm-lock.yaml
+
+      - name: Install frontend dependencies
+        run: cd app/client && pnpm install --frozen-lockfile
+
+      - name: Build frontend (TypeScript check)
+        run: cd app/client && pnpm build
+
   frontend-tests:
     runs-on: ubuntu-latest
-    needs: [frontend-linting]
+    needs: [frontend-linting, frontend-build]
     steps:
       - uses: actions/checkout@v4
 

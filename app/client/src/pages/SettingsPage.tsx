@@ -178,7 +178,7 @@ export function SettingsPage() {
 
   const handleConnectSpotify = () => {
     if (spotifyStatus && !spotifyStatus.isAuthorized) {
-      showToast.error(
+      toast.error(
         'Spotify access not authorized. This application is limited to authorized users because Spotify restricts API access during development. Please contact tomaszeuskm@gmail.com to request access.',
         { duration: 6000 }
       );
@@ -209,7 +209,7 @@ export function SettingsPage() {
     setIsLoading(true);
     try {
       await spotifyApi.disconnect();
-      setSpotifyStatus({ isConnected: false, isTokenValid: false });
+      setSpotifyStatus({ isConnected: false, isTokenValid: false, isAuthorized: false });
       setSpotifyProfile(null);
       updateSpotifyConnection(false);
       showToast.success('Spotify account disconnected');
