@@ -141,4 +141,5 @@ app.MapHub<AgentHub>("/hubs/agent").RequireAuthorization();
 
 logger.LogInformation("=== Application Started Successfully ===");
 app.Run();
+
 public partial class Program { }
