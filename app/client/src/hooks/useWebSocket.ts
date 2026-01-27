@@ -52,7 +52,7 @@ export function useWebSocket() {
       console.log('🔌 Cleaning up WebSocket connection');
       disconnect();
     };
-  }, [auth.isAuthenticated, auth.user?.access_token, connect, disconnect]);
+  }, [auth.isAuthenticated, auth.idToken, connect, disconnect]);
 
   useEffect(() => {
     const unsubscribe = websocketService.onStatusUpdate((update) => {
