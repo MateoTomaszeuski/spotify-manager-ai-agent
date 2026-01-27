@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS users (
     spotify_access_token TEXT,
     spotify_refresh_token TEXT,
     spotify_token_expiry TIMESTAMP,
+    spotify_authorized TIMESTAMP,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );

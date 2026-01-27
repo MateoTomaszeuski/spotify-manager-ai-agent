@@ -7,6 +7,7 @@ public class User {
     public string? SpotifyAccessToken { get; set; }
     public string? SpotifyRefreshToken { get; set; }
     public DateTime? SpotifyTokenExpiry { get; set; }
+    public DateTime? SpotifyAuthorized { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 }

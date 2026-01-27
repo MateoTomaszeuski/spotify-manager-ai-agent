@@ -57,11 +57,13 @@ builder.Services.AddCors(options => {
                   "http://localhost:5173",
                   "https://localhost:5173",
                   "https://127.0.0.1:5173",
-                  "https://spotify.mateo.tomaszeuski.com"
+                  "https://spotify.mateo.tomaszeuski.com",
+                  "https://accounts.google.com"
               )
               .AllowAnyMethod()
               .AllowAnyHeader()
-              .AllowCredentials();
+              .AllowCredentials()
+              .WithExposedHeaders("*");
     });
 });
 

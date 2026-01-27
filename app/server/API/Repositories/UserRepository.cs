@@ -27,6 +27,7 @@ public class UserRepository : IUserRepository {
                    spotify_access_token as SpotifyAccessToken, 
                    spotify_refresh_token as SpotifyRefreshToken,
                    spotify_token_expiry as SpotifyTokenExpiry,
+                   spotify_authorized as SpotifyAuthorized,
                    created_at as CreatedAt, updated_at as UpdatedAt
             FROM users
             WHERE id = @Id";
@@ -42,6 +43,7 @@ public class UserRepository : IUserRepository {
                    spotify_access_token as SpotifyAccessToken, 
                    spotify_refresh_token as SpotifyRefreshToken,
                    spotify_token_expiry as SpotifyTokenExpiry,
+                   spotify_authorized as SpotifyAuthorized,
                    created_at as CreatedAt, updated_at as UpdatedAt
             FROM users
             WHERE email = @Email";
@@ -62,6 +64,7 @@ public class UserRepository : IUserRepository {
                       spotify_access_token as SpotifyAccessToken, 
                       spotify_refresh_token as SpotifyRefreshToken,
                       spotify_token_expiry as SpotifyTokenExpiry,
+                      spotify_authorized as SpotifyAuthorized,
                       created_at as CreatedAt, updated_at as UpdatedAt";
 
         return await connection.QuerySingleAsync<User>(sql, user);
@@ -76,6 +79,7 @@ public class UserRepository : IUserRepository {
                 spotify_access_token = @SpotifyAccessToken,
                 spotify_refresh_token = @SpotifyRefreshToken,
                 spotify_token_expiry = @SpotifyTokenExpiry,
+                spotify_authorized = @SpotifyAuthorized,
                 updated_at = @UpdatedAt
             WHERE id = @Id";
 

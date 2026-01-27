@@ -128,10 +128,12 @@ public class SpotifyController : ControllerBase {
 
         var isConnected = !string.IsNullOrEmpty(user.SpotifyAccessToken);
         var isTokenValid = user.SpotifyTokenExpiry.HasValue && user.SpotifyTokenExpiry.Value > DateTime.UtcNow;
+        var isAuthorized = user.SpotifyAuthorized.HasValue;
 
         return Ok(new {
             isConnected = isConnected,
             isTokenValid = isTokenValid,
+            isAuthorized = isAuthorized,
             tokenExpiry = user.SpotifyTokenExpiry
         });
     }

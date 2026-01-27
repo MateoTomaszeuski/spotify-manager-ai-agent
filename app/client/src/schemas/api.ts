@@ -4,6 +4,7 @@ export const UserSchema = z.object({
   id: z.number(),
   email: z.string().email(),
   displayName: z.string().optional(),
+  spotifyAuthorized: z.string().optional().nullable(),
   createdAt: z.string(),
   updatedAt: z.string(),
 });
@@ -77,6 +78,7 @@ export const AgentActionResponseSchema = z.object({
 export const SpotifyConnectionStatusSchema = z.object({
   isConnected: z.boolean(),
   isTokenValid: z.boolean(),
+  isAuthorized: z.boolean(),
   tokenExpiry: z.string().optional(),
 });
 
