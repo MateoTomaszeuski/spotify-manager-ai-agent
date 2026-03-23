@@ -7,6 +7,7 @@ on:
       - completed
     branches:
       - main
+      - local
 
 jobs:
   build-and-push:
