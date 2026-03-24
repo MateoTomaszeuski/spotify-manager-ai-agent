@@ -20,18 +20,19 @@ public class SpotifyTrackService : ISpotifyTrackService {
         _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
     }
 
-    public async Task<SpotifyTrack[]> SearchTracksAsync(string accessToken, string query, int limit = 20) {
+    public async Task<SpotifyTrack[]> SearchTracksAsync(string accessToken, string query, int limit = 20, int offset = 0) {
         SetAuthorizationHeader(accessToken);
 
         var encodedQuery = Uri.EscapeDataString(query);
-        var url = $"{SpotifyApiBaseUrl}/search?q={encodedQuery}&type=track&limit={limit}";
+        var safeOffset = Math.Max(0, offset);
+        var url = $"{SpotifyApiBaseUrl}/search?q={encodedQuery}&type=track&limit={limit}&offset={safeOffset}";
 
         var response = await _httpClient.GetAsync(url);
 
         if (!response.IsSuccessStatusCode) {
             var errorContent = await response.Content.ReadAsStringAsync();
-            _logger.LogError("Spotify search request failed with status {StatusCode}. Query: {Query}. Error: {Error}",
-                response.StatusCode, query, errorContent);
+            _logger.LogError("Spotify search request failed with status {StatusCode}. Query: {Query}. Offset: {Offset}. Error: {Error}",
+                response.StatusCode, query, safeOffset, errorContent);
         }
 
         response.EnsureSuccessStatusCode();
@@ -42,7 +43,7 @@ public class SpotifyTrackService : ISpotifyTrackService {
 
         var tracks = items.EnumerateArray().Select(SpotifyJsonParser.ParseTrack).ToArray();
 
-        _logger.LogInformation("Spotify search for '{Query}' returned {Count} tracks", query, tracks.Length);
+        _logger.LogInformation("Spotify search for '{Query}' (offset {Offset}) returned {Count} tracks", query, safeOffset, tracks.Length);
 
         return tracks;
     }

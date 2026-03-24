@@ -80,18 +80,22 @@ public class PlaylistCreatorService : IPlaylistCreatorService {
 
             await _notificationService.SendStatusUpdateAsync(user.Email, "processing", $"Searching Spotify for tracks matching: {playlistName}");
 
-            var requestedTrackCount = request.Preferences?.MaxTracks ?? 20;
+            var requestedTrackCount = Math.Clamp(request.Preferences?.MaxTracks ?? 20, 1, 250);
             var allTracks = new List<SpotifyTrack>();
             var trackIds = new HashSet<string>();
             var trackUris = new HashSet<string>();
             var trackNameArtistSet = new HashSet<string>();
+            var queryOffsets = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 
             var searchLimit = Math.Min(50, requestedTrackCount);
+            queryOffsets[searchQuery] = 0;
             var initialTracks = await _spotifyService.SearchTracksAsync(
                 accessToken,
                 searchQuery,
-                searchLimit
+                searchLimit,
+                queryOffsets[searchQuery]
             );
+            queryOffsets[searchQuery] += searchLimit;
 
             foreach (var track in initialTracks) {
                 var trackKey = TrackDeduplicationHelper.GetTrackKey(track);
@@ -120,14 +124,22 @@ public class PlaylistCreatorService : IPlaylistCreatorService {
                 foreach (var query in currentSearchQueries.ToList()) {
                     if (allTracks.Count >= requestedTrackCount) break;
 
-                    _logger.LogInformation("Trying query: '{Query}'", query);
+                    if (!queryOffsets.ContainsKey(query)) {
+                        queryOffsets[query] = 0;
+                    }
+
+                    var queryOffset = queryOffsets[query];
+
+                    _logger.LogInformation("Trying query: '{Query}' with offset {Offset}", query, queryOffset);
                     await _notificationService.SendStatusUpdateAsync(user.Email, "processing", $"Searching with query: '{query}'");
 
                     var additionalTracks = await _spotifyService.SearchTracksAsync(
                         accessToken,
                         query,
-                        searchLimit
+                        searchLimit,
+                        queryOffset
                     );
+                    queryOffsets[query] += searchLimit;
 
                     var tracksFoundInThisQuery = 0;
                     foreach (var track in additionalTracks) {
@@ -141,8 +153,8 @@ public class PlaylistCreatorService : IPlaylistCreatorService {
                         }
                     }
 
-                    _logger.LogInformation("After query '{Query}': found {NewTracks} new tracks, total {Count} unique tracks",
-                        query, tracksFoundInThisQuery, allTracks.Count);
+                    _logger.LogInformation("After query '{Query}' (offset {Offset}): found {NewTracks} new tracks, total {Count} unique tracks",
+                        query, queryOffset, tracksFoundInThisQuery, allTracks.Count);
 
                     await _notificationService.SendStatusUpdateAsync(user.Email, "processing", $"After query '{query}': found {tracksFoundInThisQuery} new tracks, total {allTracks.Count} unique tracks");
                 }

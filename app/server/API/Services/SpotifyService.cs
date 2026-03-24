@@ -44,8 +44,8 @@ public class SpotifyService : ISpotifyService {
     public async Task RemoveTracksFromPlaylistAsync(string accessToken, string playlistId, string[] trackUris)
         => await _playlistService.RemoveTracksFromPlaylistAsync(accessToken, playlistId, trackUris);
 
-    public async Task<SpotifyTrack[]> SearchTracksAsync(string accessToken, string query, int limit = 20)
-        => await _trackService.SearchTracksAsync(accessToken, query, limit);
+    public async Task<SpotifyTrack[]> SearchTracksAsync(string accessToken, string query, int limit = 20, int offset = 0)
+        => await _trackService.SearchTracksAsync(accessToken, query, limit, offset);
 
     public async Task<SpotifyTrack[]> GetRecommendationsAsync(string accessToken, string[] seedTracks, int limit = 20)
         => await _trackService.GetRecommendationsAsync(accessToken, seedTracks, limit);
