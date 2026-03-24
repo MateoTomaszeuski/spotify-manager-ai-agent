@@ -1,14 +1,17 @@
 # Spotify Manager AI Agent
 
 ## Elevator Pitch
+
 An intelligent Spotify management assistant that automates playlist creation, music discovery, and library organization. Users can interact with an AI agent that creates custom playlists based on natural language descriptions, suggests personalized music recommendations, discovers new tracks aligned with their taste, and cleans up duplicate songs across playlists—all while maintaining full visibility and control over every action the agent performs.
 
 ## Contributors
+
 - Mateo Tomaszeuski
 
 ## Project Features
 
 ### Core Features
+
 1. **AI-Powered Playlist Creation**
    - Natural language playlist generation (e.g., "create a workout playlist with high-energy rock songs")
    - Genre, mood, and tempo-based curation
@@ -87,6 +90,7 @@ An intelligent Spotify management assistant that automates playlist creation, mu
 ## New Technologies & Project Risks
 
 ### New Technologies to Learn
+
 1. **Spotify Web API**
    - API endpoints for playlists, tracks, and recommendations
    - Audio features analysis
@@ -108,6 +112,7 @@ An intelligent Spotify management assistant that automates playlist creation, mu
    - Undo/redo functionality for agent actions
 
 ### Project Risks
+
 1. **Spotify API Rate Limits**
    - Risk: Agent operations may be throttled during heavy usage
    - Mitigation: Implement request queuing and caching strategies
@@ -275,9 +280,10 @@ An intelligent Spotify management assistant that automates playlist creation, mu
 
 ### Oct 29 (Week 1 - Foundation)
 
-#### Estimates:
+#### Estimates
 
 **Rubric Items:**
+
 - CI/CD pipeline configured with GitHub Actions
 - Linter runs automatically in pipeline
 - Automated testing setup (abort build if fails)
@@ -286,6 +292,7 @@ An intelligent Spotify management assistant that automates playlist creation, mu
 - Authorized pages and public pages
 
 **Features:**
+
 - Project scaffolding with Vite + React + TypeScript
 - ESLint configuration
 - GitHub Actions workflow for CI/CD
@@ -294,9 +301,10 @@ An intelligent Spotify management assistant that automates playlist creation, mu
 - Basic dashboard layout (authorized)
 - Protected route wrapper component
 
-#### Delivered:
+#### Delivered
 
 **Rubric Items:**
+
 - CI/CD pipeline configured with GitHub Actions
 - Linter runs automatically in pipeline (pnpm lint for frontend)
 - Automated testing setup (dotnet test for backend, aborts on fail)
@@ -304,6 +312,7 @@ An intelligent Spotify management assistant that automates playlist creation, mu
 - Developer type helping (TypeScript throughout)
 
 **Features:**
+
 - Project scaffolding with Vite + React + TypeScript (app/client)
 - C# ASP.NET Core Web API with controllers (app/server/API)
 - Unit test project with TUnit (app/server/API.UnitTests)
@@ -319,9 +328,10 @@ An intelligent Spotify management assistant that automates playlist creation, mu
 
 ### Nov 1 (Week 2 - Core Infrastructure)
 
-#### Estimates:
+#### Estimates
 
 **Rubric Items:**
+
 - Global client-side state management
 - Developer type helping (TypeScript throughout)
 - 2+ reusable layout components (MainLayout, AuthLayout)
@@ -330,6 +340,7 @@ An intelligent Spotify management assistant that automates playlist creation, mu
 - Data persisted on server setup (backend API initialization)
 
 **Features:**
+
 - State management store structure
 - Reusable layout components (MainLayout, AuthLayout, Sidebar)
 - Reusable form components (TextInput, SelectDropdown, Button, SearchInput)
@@ -339,9 +350,10 @@ An intelligent Spotify management assistant that automates playlist creation, mu
 - Database schema design for user data and agent logs
 - Spotify token storage and management
 
-#### Delivered:
+#### Delivered
 
 **Rubric Items:**
+
 - Global client-side state management (Zustand with 3 stores: user, agent, UI)
 - Developer type helping (TypeScript with strict types throughout)
 - 2+ reusable layout components (MainLayout, AuthLayout, Sidebar, Header - 4 total)
@@ -354,6 +366,7 @@ An intelligent Spotify management assistant that automates playlist creation, mu
 - Toasts / global notifications (react-hot-toast configured)
 
 **Features:**
+
 - Zustand stores: useUserStore, useAgentStore, useUIStore with localStorage persistence
 - Layout components: MainLayout (sidebar+header+scrollable content), AuthLayout (centered card), Sidebar (green gradient navigation), Header (user dropdown menu)
 - Form components: TextInput, SelectDropdown, Button (4 variants: primary, secondary, danger, ghost), SearchInput, Checkbox - all TypeScript typed with error states
@@ -375,20 +388,20 @@ An intelligent Spotify management assistant that automates playlist creation, mu
 - Proper overflow handling for main content area with h-screen and overflow-y-auto
 - Toggle switches in settings with green accent colors
 - Keycloak CORS configuration resolved (Web Origins set to allow frontend origin)
-- Fixed CORS policy blocking on token endpoint (https://auth-dev.snowse.io)
-- Keycloak client configuration validated (Web Origins includes https://mateo-spotify.duckdns.org)
-- TLS/SSL certificates configured for HTTPS on production domain (https://mateo-spotify.duckdns.org)
+- Fixed CORS policy blocking on token endpoint (<https://auth-dev.snowse.io>)
+- Keycloak client configuration validated (Web Origins includes <https://mateo-spotify.duckdns.org>)
+- TLS/SSL certificates configured for HTTPS on production domain (<https://mateo-spotify.duckdns.org>)
 - Secure HTTPS communication enabled for all API and authentication requests
 - Kubernetes TLS secret configured with SSL certificates for ingress
-
 
 ---
 
 ### Nov 5 (Week 3 - Agent Core Functions Part 1)
 
-#### Estimates:
+#### Estimates
 
 **Rubric Items:**
+
 - 2 custom functions implemented (`createSmartPlaylist`, `discoverNewMusic`)
 - 1+ action(s) can be performed autonomously
 - Structured output validated with Zod
@@ -396,6 +409,7 @@ An intelligent Spotify management assistant that automates playlist creation, mu
 - Network calls - write data (POST create playlist)
 
 **Features:**
+
 - Playlist Creator page with natural language input
 - `createSmartPlaylist()` agent function implementation
 - `discoverNewMusic()` agent function implementation
@@ -404,9 +418,10 @@ An intelligent Spotify management assistant that automates playlist creation, mu
 - Zod schemas for API responses and agent outputs
 - Agent action logging to database
 
-#### Delivered:
+#### Delivered
 
 **Rubric Items:**
+
 - 2 custom functions implemented (`createSmartPlaylist`, `discoverNewMusic`)
 - 1+ action(s) can be performed autonomously (both functions run autonomously)
 - Structured output validated with Zod (frontend validation schemas)
@@ -416,6 +431,7 @@ An intelligent Spotify management assistant that automates playlist creation, mu
 - Data persisted on server (PostgreSQL with Dapper ORM)
 
 **Features:**
+
 - **Backend Architecture Switch**: Migrated from EF Core to Dapper for better performance and control
 - **Database Schema**: PostgreSQL with init.sql and seed.sql for Docker integration
   - Users table with Spotify token management
@@ -585,14 +601,14 @@ An intelligent Spotify management assistant that automates playlist creation, mu
   - Multiple batches of recommendations to meet requested track count
   - Comprehensive logging for debugging and optimization
 
-
 ---
 
 ### Nov 8 (Week 4 - Agent Core Functions Part 2)
 
-#### Estimates:
+#### Estimates
 
 **Rubric Items:**
+
 - 2 additional custom functions (`removeDuplicates`, `suggestMusicByContext`)
 - 1+ action(s) require user confirmation to perform
 - 1+ action(s) automatically adjust UI when performed
@@ -600,6 +616,7 @@ An intelligent Spotify management assistant that automates playlist creation, mu
 - Error handling for API requests
 
 **Features:**
+
 - Duplicate Cleaner page with confirmation UI
 - `removeDuplicates()` agent function with user approval flow
 - Music Suggestion Engine page
@@ -608,9 +625,10 @@ An intelligent Spotify management assistant that automates playlist creation, mu
 - API error handling with retry logic
 - Auto-navigation after playlist creation
 
-#### Delivered:
+#### Delivered
 
 **Rubric Items:**
+
 - 2 additional custom functions (`ScanForDuplicatesAsync`, `ConfirmRemoveDuplicatesAsync`, `SuggestMusicByContextAsync`)
 - 1+ action(s) require user confirmation to perform (duplicate removal requires user to select which tracks to remove)
 - 1+ action(s) automatically adjust UI when performed (scan results update UI, suggestions display dynamically)
@@ -618,6 +636,7 @@ An intelligent Spotify management assistant that automates playlist creation, mu
 - Error handling for API requests (persistent error toasts with manual dismiss)
 
 **Features:**
+
 - **Enhanced Toast System**:
   - Custom styled toasts matching Spotify green theme
   - Success toasts: green background (#065f46), auto-dismiss after 4s
@@ -767,20 +786,21 @@ An intelligent Spotify management assistant that automates playlist creation, mu
   - Backend ingress now routes HTTPS traffic to backend service
   - TLS secret configuration updated for new domain
 
-
 ---
 
 ### Nov 12 (Week 5 - Agentic Loop & Persistence)
 
-#### Estimates:
+#### Estimates
 
 **Rubric Items:**
+
 - Agentic loop runs until task complete or user intervention required
 - LLM decisions and actions persisted and can be inspected
 - Unit tests run automatically in pipeline
 - Real-time WebSocket communication (Additional Task)
 
 **Features:**
+
 - Agent Control Center page with live status
 - Agentic orchestration loop implementation
 - Agent action history database persistence
@@ -790,14 +810,16 @@ An intelligent Spotify management assistant that automates playlist creation, mu
 - Unit tests for agent functions
 - Unit tests for API endpoints
 
-#### Delivered:
+#### Delivered
 
 **Rubric Items:**
+
 - Agentic loop runs until task complete or user intervention required (smart playlist creation runs iterative search loop until track count met)
 - LLM decisions and actions persisted and can be inspected (all agent actions logged to database with JSONB data)
 - Unit tests run automatically in pipeline (backend service and repository tests)
 
 **Features:**
+
 - **Spotify Token Refresh & Persistence**:
   - SpotifyTokenService - Centralized token validation and refresh logic
   - RefreshAccessTokenAsync() - Automatic token renewal using refresh_token
@@ -939,17 +961,18 @@ An intelligent Spotify management assistant that automates playlist creation, mu
   - Responsive design for all new pages
   - Hover effects and smooth transitions
 
-
 ---
 
 ### Nov 15 (Week 6 - Additional Pages & UI Polish)
 
-#### Estimates:
+#### Estimates
 
 **Rubric Items:**
+
 - 10+ pages/views with router (complete remaining pages)
 
 **Features:**
+
 - Playlist Analytics page with visualizations
 - Dashboard home page with metrics and quick actions
 - Complete all 10 pages/views
@@ -958,12 +981,14 @@ An intelligent Spotify management assistant that automates playlist creation, mu
 - Genre distribution visualizations
 - UI polish and responsive design improvements
 
-#### Delivered:
+#### Delivered
 
 **Rubric Items:**
+
 - 10+ pages/views with router (all 10 pages fully implemented and functional)
 
 **Features:**
+
 - **Agent Control Center Page Enhancements**:
   - Global timer context (AgentTimerProvider) for persistent timer across page navigation
   - Real-time timer display in mm:ss format with live updating every 100ms
@@ -1010,7 +1035,7 @@ An intelligent Spotify management assistant that automates playlist creation, mu
   - **Bar Chart**: Actions by type (5 categories) with green color scale showing usage distribution
   - **Doughnut Chart**: Duplicates removed vs present (green/red) showing cleanup effectiveness
   - **Feature Usage Progress Bars**: Visual representation of feature adoption with percentages
-  - **Detailed Stats Panel**: 
+  - **Detailed Stats Panel**:
     - Scans performed count
     - Duplicates found and removed counts
     - Average duplicates per playlist metric
@@ -1030,7 +1055,7 @@ An intelligent Spotify management assistant that automates playlist creation, mu
 - **Dashboard Page Complete Overhaul**:
   - **Database-Driven Metrics**: All data now fetched from PostgreSQL, no more in-memory store limitations
   - **Dual Data Fetching**: Promise.all for parallel loading of analytics and recent actions
-  - **4 Metric Cards**: 
+  - **4 Metric Cards**:
     - Agent Status (with spinning animation when processing)
     - Total Actions (from analytics API, not limited to 10)
     - Completed Actions (from analytics API with accurate counts)
@@ -1122,18 +1147,19 @@ An intelligent Spotify management assistant that automates playlist creation, mu
     - React Strict Mode runs effects twice in development
     - Now shows single toast and loads data once
 
-
 ---
 
 ### Nov 19 (Week 7 - Advanced Features & Testing)
 
-#### Estimates:
+#### Estimates
 
 **Rubric Items:**
+
 - Implement websockets (Additional Task - optional)
 - Comprehensive unit test coverage
 
 **Features:**
+
 - Agent performance benchmarking dashboard
 - Implement websockets
 - Batch operations support (process multiple playlists)
@@ -1142,12 +1168,14 @@ An intelligent Spotify management assistant that automates playlist creation, mu
 - E2E tests for critical user flows
 - Test coverage reporting in CI/CD
 
-#### Delivered:
+#### Delivered
 
 **Rubric Items:**
+
 - Real-time WebSocket communication implemented (SignalR)
 
 **Features:**
+
 - **SignalR WebSocket Backend**:
   - Created `Hubs/AgentHub.cs` with connection lifecycle management
   - `OnConnectedAsync()` logs connection ID, user email/name, timestamp, and transport type (WebSocket/SSE/LongPolling)
@@ -1257,20 +1285,21 @@ An intelligent Spotify management assistant that automates playlist creation, mu
   - All unit tests passing
   - SignalR included in ASP.NET Core 9 by default (no extra package needed)
 
-
 ---
 
 ### Nov 22 (Week 8 - Optimization & UX)
 
-#### Estimates:
+#### Estimates
 
 **Rubric Items:**
+
 - Stream Agent Loop (Additional Task - optional)
 - Performance optimization complete
 - All error handling edge cases covered
 
 **Features:**
-- Update the User with the agent last action 
+
+- Update the User with the agent last action
   - this is being shown in the Backend Logs already, just needs to update the user.
 - Lazy loading for large playlists
 - Virtualization for long lists
@@ -1281,12 +1310,14 @@ An intelligent Spotify management assistant that automates playlist creation, mu
 - User preference persistence
 - Keyboard shortcuts and accessibility improvements
 
-#### Delivered:
+#### Delivered
 
 **Rubric Items:**
+
 - Stream Agent Loop (WebSocket real-time updates)
 
 **Features:**
+
 - **Streaming Agent Loop Implementation**:
   - Real-time LLM action updates displayed to users during all agent operations
   - WebSocket integration in `useAgent` hook listens for `AgentStatusUpdate` events
@@ -1316,7 +1347,7 @@ An intelligent Spotify management assistant that automates playlist creation, mu
   - "Iteration {x}/{max}: Found {count}/{total} tracks"
   - "Searching with query: '{query}'"
   - **"After query '{query}': found {x} new tracks, total {y} unique tracks"**
-  - **"AI generated {count} new search strategies to find more tracks"** 
+  - **"AI generated {count} new search strategies to find more tracks"**
   - "Creating playlist with {count} tracks..."
   - "Adding tracks to playlist..."
   - "Playlist '{name}' created successfully!"
@@ -1420,13 +1451,15 @@ An intelligent Spotify management assistant that automates playlist creation, mu
 
 ### Nov 25 (Week 9 - Integration & Bug Fixes)
 
-#### Estimates:
+#### Estimates
 
 **Rubric Items:**
+
 - All rubric items integration tested
 - Production deployment stable
 
 **Features:**
+
 - End-to-end feature integration testing
 - Cross-browser compatibility testing
 - Mobile responsiveness verification
@@ -1435,13 +1468,15 @@ An intelligent Spotify management assistant that automates playlist creation, mu
 - Security audit (OAuth flow, API keys)
 - Documentation updates
 
-#### Delivered:
+#### Delivered
 
 **Rubric Items:**
+
 - Component architecture refactoring completed
 - Production build optimized and tested
 
 **Features:**
+
 - **InfoBox Component Smooth Transitions**:
   - Replaced conditional rendering with smooth CSS animations
   - Added `max-h-0` to `max-h-96` transition with 300ms duration
@@ -1696,13 +1731,15 @@ An intelligent Spotify management assistant that automates playlist creation, mu
 
 ### Dec 3 (Week 10 - Buffer & Final Polish)
 
-#### Estimates:
+#### Estimates
 
 **Rubric Items:**
+
 - All remaining rubric items completed
 - Final production deployment
 
 **Features:**
+
 - Overflow work from previous weeks
 - Final bug fixes
 - UI/UX refinements based on testing
@@ -1711,9 +1748,10 @@ An intelligent Spotify management assistant that automates playlist creation, mu
 - Demo preparation
 - User guide/help section
 
-#### Delivered:
+#### Delivered
 
 **Rubric Items:**
+
 - Toasts / global notifications with user preferences
 - Settings page redesigned
 - All toast notifications respect user preferences
@@ -1723,6 +1761,7 @@ An intelligent Spotify management assistant that automates playlist creation, mu
 - Real-time streaming status updates for all agent features
 
 **Features:**
+
 - **API Client Timeout Improvements**:
   - Added 5-minute timeout using AbortController for all API requests
   - Prevents indefinite hangs on long-running operations
@@ -1828,7 +1867,7 @@ An intelligent Spotify management assistant that automates playlist creation, mu
     - Created `AgentAnalyticsService.cs` (67 lines) - App usage analytics aggregation
     - Created `AgentHistoryService.cs` (128 lines) - Action history management
     - Created `ConversationValidator.cs` helper for ownership validation
-  - **SpotifyController** reduced from 435 to 317 lines 
+  - **SpotifyController** reduced from 435 to 317 lines
     - Created `PlaylistAnalyticsService.cs` (100 lines) - Playlist audio features analytics
   - **All Tests Passing**: Updated all unit tests with new service dependencies
 
@@ -1870,7 +1909,7 @@ An intelligent Spotify management assistant that automates playlist creation, mu
     - Playlist context analysis: AI examines existing tracks to understand playlist theme
     - Adaptive search strategies: AI generates new approaches mid-process if needed
     - Anti-repetition logic: Excludes tracks already suggested or in playlists
-  - **Iteration System**: 
+  - **Iteration System**:
     - Outer loop: Up to 5 attempts to generate search strategies
     - Inner loop: Up to 5 search iterations per strategy
     - Real-time progress updates via SignalR
@@ -1998,13 +2037,15 @@ An intelligent Spotify management assistant that automates playlist creation, mu
 
 ### Dec 6 (Final Submission)
 
-#### Estimates:
+#### Estimates
 
 **Rubric Items:**
+
 - Final verification all rubric items complete
 - Production deployment verified
 
 **Features:**
+
 - Final testing and validation
 - Submission preparation
 - Demo video/presentation materials
@@ -2012,7 +2053,7 @@ An intelligent Spotify management assistant that automates playlist creation, mu
 - README updates with deployment links
 - Final deployment verification
 
-#### Delivered:
+#### Delivered
 
 **Rubric Items:**
 
@@ -2021,6 +2062,7 @@ An intelligent Spotify management assistant that automates playlist creation, mu
 ---
 
 ## Notes
+
 - Each check-in targets approximately 10% of project completion
 - First two weeks focus on infrastructure (CI/CD, auth, deployment)
 - Weeks 3-5 implement core agent functionality
@@ -2037,9 +2079,11 @@ An intelligent Spotify management assistant that automates playlist creation, mu
 This section documents all component extraction and refactoring work completed to improve code maintainability, reusability, and organization across the frontend application.
 
 #### Dashboard Page Refactoring
+
 **Created:** `components/dashboard/` directory
 
 **Components Extracted:**
+
 - **MetricCard.tsx** - Reusable metric display card with icon, label, value, and loading state support
   - Props: `icon`, `label`, `value`, `loading`
   - Used for: Agent Status, Total Actions, Completed Actions, Failed Actions metrics
@@ -2061,6 +2105,7 @@ This section documents all component extraction and refactoring work completed t
   - Used in: Dashboard page for recent activity section
 
 **Impact:**
+
 - Reduced DashboardPage.tsx from ~280 lines to ~130 lines (~53% reduction)
 - Created 4 reusable components for metrics and navigation patterns
 - Improved code readability and maintainability
@@ -2069,9 +2114,11 @@ This section documents all component extraction and refactoring work completed t
 ---
 
 #### Landing Page Refactoring
+
 **Created:** `components/landing/` directory
 
 **Components Extracted:**
+
 - **HeroSection.tsx** - Main hero section with title, description, and CTA
   - Props: `onSignIn` (callback function)
   - Features: Gradient text effects, responsive typography, centered layout, Keycloak OAuth integration
@@ -2088,6 +2135,7 @@ This section documents all component extraction and refactoring work completed t
   - Used in: Landing page features section
 
 **Impact:**
+
 - Reduced LandingPage.tsx from ~180 lines to ~70 lines (~61% reduction)
 - Created 3 reusable components for landing/marketing pages
 - Separated concerns between layout and content
@@ -2096,9 +2144,11 @@ This section documents all component extraction and refactoring work completed t
 ---
 
 #### Playlist Creator Page Refactoring
+
 **Created:** `components/playlist-creator/` directory
 
 **Components Extracted:**
+
 - **PlaylistForm.tsx** - Main playlist creation form with all inputs
   - Props: `prompt`, `trackCount`, `onPromptChange`, `onTrackCountChange`, `onSubmit`, `onClear`, `isCreating`
   - Features: Natural language text input, track count selector (10-250), clear button, submit button with loading state
@@ -2115,6 +2165,7 @@ This section documents all component extraction and refactoring work completed t
   - Used in: Playlist Creator page to show playlist history
 
 **Impact:**
+
 - Reduced PlaylistCreatorPage.tsx from ~250 lines to ~110 lines (~56% reduction)
 - Created 3 reusable components for playlist creation flow
 - Separated form logic from page orchestration
@@ -2123,9 +2174,11 @@ This section documents all component extraction and refactoring work completed t
 ---
 
 #### Discover Page Refactoring
+
 **Created:** `components/discover/` directory
 
 **Components Extracted:**
+
 - **DiscoverySettings.tsx** - Discovery configuration panel
   - Props: `trackLimit`, `onLimitChange`, `onDiscover`, `isDiscovering`
   - Features: Track limit selector (5-250 tracks), discover button with loading state, disabled during processing
@@ -2137,6 +2190,7 @@ This section documents all component extraction and refactoring work completed t
   - Used in: Discover page to show latest discovered music
 
 **Impact:**
+
 - Reduced DiscoverPage.tsx from ~238 lines to ~79 lines (~67% reduction)
 - Created 2 reusable components for music discovery feature
 - Cleaner separation between settings and results display
@@ -2145,9 +2199,11 @@ This section documents all component extraction and refactoring work completed t
 ---
 
 #### Duplicate Cleaner Page Refactoring
+
 **Created:** `components/duplicate-cleaner/` directory
 
 **Components Extracted:**
+
 - **PlaylistSelector.tsx** - Playlist selection and sync controls
   - Props: `playlists`, `selectedPlaylistId`, `onPlaylistChange`, `onSync`, `onScan`, `isScanning`, `isSyncing`
   - Features: Playlist dropdown with track counts, "Sync with Spotify" button, "Scan for Duplicates" button, loading states
@@ -2164,6 +2220,7 @@ This section documents all component extraction and refactoring work completed t
   - Used in: Duplicate Cleaner page to show scan results and batch actions
 
 **Impact:**
+
 - Reduced DuplicateCleanerPage.tsx from ~301 lines to ~94 lines (~69% reduction)
 - Created 3 reusable components for duplicate detection and removal
 - Eliminated inline component function (DuplicateGroupCard was previously defined inside page component)
@@ -2172,9 +2229,11 @@ This section documents all component extraction and refactoring work completed t
 ---
 
 #### Suggestions Page Refactoring
+
 **Created:** `components/suggestions/` directory
 
 **Components Extracted:**
+
 - **SuggestionSettings.tsx** - Suggestion generation settings
   - Props: `playlists`, `selectedPlaylistId`, `onPlaylistChange`, `context`, `onContextChange`, `limit`, `onLimitChange`, `onQuickContext`, `onGenerate`, `isGenerating`
   - Features: Playlist selector, context text input, limit selector (5-50), 5 quick context example buttons, generate button with loading state
@@ -2186,6 +2245,7 @@ This section documents all component extraction and refactoring work completed t
   - Used in: Suggestions page to show and manage suggestions
 
 **Impact:**
+
 - Reduced SuggestionsPage.tsx from ~330 lines to ~127 lines (~62% reduction)
 - Created 2 reusable components for music suggestions feature
 - Better handling of selection state with Set<string>
@@ -2194,9 +2254,11 @@ This section documents all component extraction and refactoring work completed t
 ---
 
 #### Agent Control Page Refactoring
+
 **Created:** `components/agent-control/` directory
 
 **Components Extracted:**
+
 - **StatusCards.tsx** - Three-card status display grid
   - Props: `agentStatus`, `currentTask`, `timeElapsed`
   - Features: Agent Status card with color coding (green/idle, blue/processing, yellow/awaiting, red/error), Current Task card, Time Elapsed card with live timer
@@ -2218,6 +2280,7 @@ This section documents all component extraction and refactoring work completed t
   - Used in: Agent Control page to show all user conversations
 
 **Impact:**
+
 - Reduced AgentControlPage.tsx from ~329 lines to ~117 lines (~64% reduction)
 - Created 4 reusable components for agent monitoring
 - Removed all helper functions (getActionTypeLabel, getActionTypeColor, getStatusColor, formatTimestamp) - moved to component logic
@@ -2226,9 +2289,11 @@ This section documents all component extraction and refactoring work completed t
 ---
 
 #### History Page Refactoring
+
 **Created:** `components/history/` directory
 
 **Components Extracted:**
+
 - **FilterPanel.tsx** - Action filtering controls
   - Props: `actionType`, `status`, `onActionTypeChange`, `onStatusChange`, `onClearFilters`
   - Features: Action type dropdown (5 types: CreateSmartPlaylist, DiscoverNewMusic, etc.), status dropdown (4 statuses: Processing, Completed, Failed, AwaitingApproval), clear filters button
@@ -2245,6 +2310,7 @@ This section documents all component extraction and refactoring work completed t
   - Used in: History page to display filtered action list
 
 **Impact:**
+
 - Reduced HistoryPage.tsx from ~262 lines to ~64 lines (~76% reduction)
 - Created 3 reusable components for action history display
 - Removed helper functions (getActionTypeLabel, getActionTypeColor, getStatusColor, getTimeDuration) - moved to component logic
@@ -2253,12 +2319,14 @@ This section documents all component extraction and refactoring work completed t
 ---
 
 #### InfoBox Component Enhancement
+
 **Location:** `components/InfoBox.tsx`
 
 **Bug Fix: Layout Shift Issue**
+
 - **Problem:** Opening InfoBox was causing layout shifts and width changes on the page
 - **Root Cause:** Fixed `max-h-96` constraint (384px) couldn't accommodate all content, causing overflow and reflow
-- **Solution:** 
+- **Solution:**
   - Removed `max-h-96` constraint entirely
   - Changed from fixed max-height animation to conditional rendering pattern
   - When collapsed: `max-h-0 overflow-hidden` (height: 0)
@@ -2273,6 +2341,7 @@ This section documents all component extraction and refactoring work completed t
 **Total Components Created:** 21 reusable components across 8 directories
 
 **Directories:**
+
 1. `components/dashboard/` - 4 components (MetricCard, QuickActionCard, ToolCard, RecentActivity)
 2. `components/landing/` - 3 components (HeroSection, FeatureCard, FeaturesGrid)
 3. `components/playlist-creator/` - 3 components (PlaylistForm, PlaylistOptions, RecentPlaylists)
@@ -2283,6 +2352,7 @@ This section documents all component extraction and refactoring work completed t
 8. `components/history/` - 3 components (FilterPanel, ActionCard, ActionList)
 
 **Pages Refactored:** 8 pages
+
 - DashboardPage.tsx (~53% code reduction)
 - LandingPage.tsx (~61% code reduction)
 - PlaylistCreatorPage.tsx (~56% code reduction)
@@ -2293,6 +2363,7 @@ This section documents all component extraction and refactoring work completed t
 - HistoryPage.tsx (~76% code reduction)
 
 **Benefits:**
+
 - **Code Reusability:** Common patterns (cards, forms, lists) now reusable across pages
 - **Maintainability:** Smaller, focused files easier to understand and modify
 - **Testability:** Individual components can be unit tested in isolation
@@ -2302,11 +2373,13 @@ This section documents all component extraction and refactoring work completed t
 - **Separation of Concerns:** Clear boundaries between presentation, logic, and data
 
 **Helper Functions Eliminated:**
+
 - Removed ~10 helper functions from page components (getActionTypeLabel, getActionTypeColor, getStatusColor, getTimeDuration, formatTimestamp)
 - Logic moved to individual components where needed
 - Reduced complexity in page-level components
 
 **Build Verification:**
+
 - ESLint: 0 errors, 0 warnings
 - TypeScript: All compilation successful
 - Vite build: 143 modules transformed
@@ -2320,9 +2393,11 @@ This section documents all component extraction and refactoring work completed t
 This section documents the backend refactoring work completed to improve code organization, maintainability, and adherence to SOLID principles.
 
 #### MusicDiscoveryService Refactoring
+
 **Created:** `Services/Helpers/` directory for discovery helpers
 
 **Services Extracted:**
+
 - **DiscoveryQueryGenerator.cs** (171 lines) - AI-powered query generation
   - Interface: `IDiscoveryQueryGenerator`
   - Methods: `GenerateQueriesAsync()`, `AdaptQueriesAsync()`
@@ -2336,6 +2411,7 @@ This section documents the backend refactoring work completed to improve code or
   - Used in: MusicDiscoveryService for executing discovery operations
 
 **Impact:**
+
 - Reduced MusicDiscoveryService.cs from 468 to 154 lines (67% reduction)
 - Separated AI query logic from Spotify search logic
 - Improved testability with focused service classes
@@ -2344,9 +2420,11 @@ This section documents the backend refactoring work completed to improve code or
 ---
 
 #### AgentController Refactoring
+
 **Created:** `Services/Agents/` directory for agent-related services, `Services/Helpers/` for validation
 
 **Services Extracted:**
+
 - **AgentAnalyticsService.cs** (67 lines) - App usage analytics
   - Interface: `IAgentAnalyticsService`
   - Method: `GetAppAnalyticsAsync()`
@@ -2365,6 +2443,7 @@ This section documents the backend refactoring work completed to improve code or
   - Used in: AgentController to simplify validation logic
 
 **Impact:**
+
 - Reduced AgentController.cs from 466 to 332 lines (29% reduction)
 - Extracted analytics aggregation logic to dedicated service
 - Extracted history management to dedicated service
@@ -2374,9 +2453,11 @@ This section documents the backend refactoring work completed to improve code or
 ---
 
 #### SpotifyController Refactoring
+
 **Created:** `Services/Spotify/` directory for Spotify services
 
 **Services Extracted:**
+
 - **PlaylistAnalyticsService.cs** (100 lines) - Playlist audio features analytics
   - Interface: `IPlaylistAnalyticsService`
   - Method: `GetPlaylistAnalyticsAsync()`
@@ -2384,6 +2465,7 @@ This section documents the backend refactoring work completed to improve code or
   - Used in: SpotifyController analytics endpoint
 
 **Impact:**
+
 - Reduced SpotifyController.cs from 435 to 317 lines (27% reduction)
 - Separated analytics calculation from controller logic
 - Better error handling for Spotify API limitations
@@ -2394,6 +2476,7 @@ This section documents the backend refactoring work completed to improve code or
 ### Backend Refactoring Summary
 
 **Total Services Created:** 7 new service classes
+
 1. `DiscoveryQueryGenerator` - AI query generation
 2. `TrackDiscoveryHelper` - Track discovery operations
 3. `AgentAnalyticsService` - App analytics aggregation
@@ -2402,6 +2485,7 @@ This section documents the backend refactoring work completed to improve code or
 6. `PlaylistAnalyticsService` - Playlist analytics
 
 **Total Interfaces Created:** 6 new interfaces
+
 1. `IDiscoveryQueryGenerator`
 2. `ITrackDiscoveryHelper`
 3. `IAgentAnalyticsService`
@@ -2410,11 +2494,13 @@ This section documents the backend refactoring work completed to improve code or
 6. (ConversationValidator is a helper, not registered in DI)
 
 **Files Refactored:** 3 large files
+
 - MusicDiscoveryService.cs (468 → 154 lines, 67% reduction)
 - AgentController.cs (466 → 332 lines, 29% reduction)
 - SpotifyController.cs (435 → 317 lines, 27% reduction)
 
 **Key Achievements:**
+
 - **No files over 400 lines:** All previously oversized files now manageable
 - **Separation of Concerns:** AI logic, Spotify logic, analytics, and history now in separate services
 - **Dependency Injection:** All new services registered in Program.cs
@@ -2424,7 +2510,9 @@ This section documents the backend refactoring work completed to improve code or
 - **100% Test Pass Rate:** All existing tests updated and passing
 
 **Dependency Injection Updates:**
+
 - Added 6 new service registrations to Program.cs:
+
   ```csharp
   builder.Services.AddScoped<IAgentAnalyticsService, AgentAnalyticsService>();
   builder.Services.AddScoped<IAgentHistoryService, AgentHistoryService>();
@@ -2434,6 +2522,7 @@ This section documents the backend refactoring work completed to improve code or
   ```
 
 **Build Verification:**
+
 - dotnet build: All projects compiled successfully
 - dotnet test: All unit and integration tests passing
 - No breaking changes to API contracts
