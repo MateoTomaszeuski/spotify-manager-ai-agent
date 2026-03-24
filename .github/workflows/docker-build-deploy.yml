@@ -112,3 +112,5 @@ jobs:
                   cat $FILE | envsubst | kubectl apply -f -
               fi
           done
+
+          
